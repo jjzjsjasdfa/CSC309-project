@@ -1,0 +1,107 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum RoleType {
+  regular
+  cashier
+  manager
+  superuser
+}
+
+enum TransactionType {
+  purchase
+  redemption
+  adjustment
+  event
+  transfer
+}
+
+enum PromotionType {
+  automatic
+  onetime
+}
+
+model User {
+  id              Int              @id @default(autoincrement())
+  utorid          String           @unique
+  password        String?
+  name            String
+  email           String           @unique
+  birthday        DateTime?
+  role            RoleType
+  points          Int              @default(0)
+  createdAt       DateTime         @default(now())
+  lastLogin       DateTime?
+  verified        Boolean          @default(false)
+  activated       Boolean          @default(false)
+  suspicious      Boolean?
+  expiresAt       DateTime
+  resetToken      String
+  avatarUrl       String?
+  organizes       Event[]          @relation("UserOrganizedEvent")
+  guestsEvent     Event[]          @relation("UserGuestEvent")
+  promotionUsages PromotionUsage[]
+  transactions    Transaction[]
+}
+
+model Transaction {
+  id          Int             @id @default(autoincrement())
+  type        TransactionType
+  utorid      String
+  user        User            @relation(fields: [utorid], references: [utorid])
+  spent       Float?
+  promotions  Promotion[]     @relation("TransactionPromotion")
+  earned      Int?
+  remark      String?
+  suspicious  Boolean         @default(false)
+  amount      Int?
+  relatedId   Int?
+  createdBy   String
+  processedBy String?
+}
+
+model Promotion {
+  id          Int              @id @default(autoincrement())
+  name        String
+  description String
+  type        PromotionType
+  startTime   DateTime
+  endTime     DateTime
+  minSpending Float?
+  rate        Float?
+  points      Int?
+  usages      PromotionUsage[]
+  Transaction Transaction[]    @relation("TransactionPromotion")
+}
+
+model PromotionUsage {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  promotionId Int
+  usedAt      DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id])
+  promotion Promotion @relation(fields: [promotionId], references: [id])
+}
+
+model Event {
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String
+  location      String
+  startTime     DateTime
+  endTime       DateTime
+  capacity      Int?
+  pointsRemain  Int
+  pointsAwarded Int      @default(0)
+  published     Boolean  @default(false)
+  organizers    User[]   @relation("UserOrganizedEvent")
+  guests        User[]   @relation("UserGuestEvent")
+  numGuests     Int      @default(0)
+}
