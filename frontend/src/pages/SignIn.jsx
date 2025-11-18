@@ -167,7 +167,7 @@ export default function SignIn(props) {
                 id="utorid"
                 type="text"
                 name="utorid"
-                placeholder="utorid00"
+                placeholder="utorid"
                 autoComplete="utorid"
                 autoFocus
                 required
@@ -182,7 +182,7 @@ export default function SignIn(props) {
                 error={passwordError}
                 helperText={passwordErrorMessage}
                 name="password"
-                placeholder="••••••"
+                placeholder="•••••••••"
                 type="password"
                 id="password"
                 autoComplete="current-password"
