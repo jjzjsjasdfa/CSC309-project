@@ -6,8 +6,8 @@ import Layout from './components/Layout';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
-import AppTheme from './contexts/theme/AppTheme';
 import {AuthProvider} from "./contexts/AuthContext";
+import Profile from "./pages/Profile";
 
 
 export default function App() {
@@ -17,9 +17,10 @@ export default function App() {
         <CssBaseline />
         <BrowserRouter>
           <Routes>
-            <Route index element={<SignIn disableCustomTheme={false}/>} />
-            <Route path="*" element={<NotFound />} />
-            <Route path="/:id" element={<Layout />}>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<SignIn disableCustomTheme={false}/>} />
+              <Route path="me" element={<Profile />} />
+              <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
         </BrowserRouter>

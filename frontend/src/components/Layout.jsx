@@ -21,15 +21,15 @@ const Layout = () => {
     };
 
     return <>
-        <header>
-            <Link to="/" className="link">AppName</Link>
-        </header>
+        {/*<header>*/}
+        {/*    <Link to="/" className="link">AppName</Link>*/}
+        {/*</header>*/}
         <main>
             <Outlet />
         </main>
-        <footer>
-            &copy; CSC309, {get_academic_term()}, University of Toronto.
-        </footer>
+        {/*<footer>*/}
+        {/*    &copy; CSC309, {get_academic_term()}, University of Toronto.*/}
+        {/*</footer>*/}
     </>;
 };
 

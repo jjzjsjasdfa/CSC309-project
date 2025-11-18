@@ -13,7 +13,9 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from '../components/ForgotPassword';
 import AppTheme from '../contexts/theme/AppTheme';
 import ColorModeSelect from '../contexts/theme/ColorModeSelect';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from '../components/CustomIcons';
+import { SitemarkIcon } from '../components/CustomIcons';
+import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from "react-router-dom";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -57,40 +59,25 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-export default function SignIn(props: { disableCustomTheme?: boolean }) {
+export default function SignIn(props) {
   const [utoridError, setUtoridError] = React.useState(false);
   const [utoridErrorMessage, setUtoridErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (utoridError || passwordError) {
-      event.preventDefault();
-      return;
-    }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      utorid: data.get('utorid'),
-      password: data.get('password'),
-    });
-  };
+  const handleClickOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const validateInputs = () => {
-    const utorid = document.getElementById('utorid') as HTMLInputElement;
-    const password = document.getElementById('password') as HTMLInputElement;
+    const utorid = document.getElementById('utorid');
+    const password = document.getElementById('password');
 
     let isValid = true;
 
-    if (!utorid.value || !/\S+@\S+\.\S+/.test(utorid.value)) {
+    if (!utorid.value || !/^[a-zA-Z0-9]{7,8}$/.test(utorid.value)) {
       setUtoridError(true);
       setUtoridErrorMessage('Please enter a valid utorid.');
       isValid = false;
@@ -99,9 +86,9 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       setUtoridErrorMessage('');
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (!password.value || password.value.length < 8 || password.value.length > 20) {
       setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
+      setPasswordErrorMessage('Password must be 8-20 characters long.');
       isValid = false;
     } else {
       setPasswordError(false);
@@ -109,6 +96,42 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     }
 
     return isValid;
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!validateInputs()) return;
+
+    const data = new FormData(event.currentTarget);
+    const utorid = data.get('utorid');
+    const password = data.get('password');
+
+    try {
+      const res = await fetch("/auth/tokens", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ utorid, password }),
+      });
+
+      const responseData = await res.json();
+      console.log(responseData);
+
+
+      // authentication failed
+      if (!res.ok) {
+        setUtoridError(true);
+        setPasswordError(true);
+        setPasswordErrorMessage(`${responseData.error}`);
+        return;
+      }
+
+      // authentication successful
+      login({ token: responseData.token });
+      navigate("/me");
+    } catch (err) {
+      console.error("Error:", err);
+    }
   };
 
   return (
@@ -142,7 +165,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 error={utoridError}
                 helperText={utoridErrorMessage}
                 id="utorid"
-                type="utorid"
+                type="text"
                 name="utorid"
                 placeholder="utorid00"
                 autoComplete="utorid"
@@ -163,7 +186,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                autoFocus
                 required
                 fullWidth
                 variant="outlined"
