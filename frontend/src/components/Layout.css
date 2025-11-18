@@ -1,0 +1,35 @@
+header {
+    background-color: #4e53b1;
+    padding: 12px 24px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+header .link {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+header .link:hover {
+    color: #ffd700;
+}
+
+footer {
+    background-color: #45505e;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    text-align: center;
+    margin-top: auto;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+main {
+    max-width: 1280px;
+    min-width: 320px;
+    margin: 0px auto;
+}
