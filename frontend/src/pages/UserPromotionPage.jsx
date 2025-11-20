@@ -11,6 +11,11 @@ function UserPromotionPage() {
     const [promotions, setPromotions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+
+    const typeLabels = {
+        automatic: 'Automatic',
+        'one-time': 'One-Time',
+    };
     
     useEffect(() => {
         async function loadPromotions() {
@@ -61,16 +66,16 @@ function UserPromotionPage() {
     const formatDate = (d) =>
         isNaN(d.getTime()) ? '-' : d.toLocaleDateString();
 
-    return {
-        id: promo.id,
-        name: promo.name,
-        description: promo.description,
-        type: promo.type,
-        minSpending: promo.minSpending,
-        rate: promo.rate,
-        points: promo.points,
-        timeRange: `${formatDate(start)} – ${formatDate(end)}`,
-    };
+        return {
+            id: promo.id,
+            name: promo.name,
+            description: promo.description,
+            type: promo.type,
+            minSpending: promo.minSpending,
+            rate: promo.rate,
+            points: promo.points,
+            timeRange: `${formatDate(start)} – ${formatDate(end)}`,
+        };
     });
 
     const columns = [
@@ -79,17 +84,20 @@ function UserPromotionPage() {
         {
             field: 'type',
             headerName: 'Type',
-            width: 120,
-            valueFormatter: (params) =>
-            params.value === 'automatic' ? 'Automatic' : 'Code',
+            width: 160,
+            valueFormatter: (params) => {
+                const raw = params.value;
+                return typeLabels[raw] || raw;
+            },
         },
         {
             field: 'minSpending',
             headerName: 'Min Spending',
             width: 140,
             valueFormatter: (params) => {
-            if (params.value == null) return '-';
-            return `$${params.value.toFixed(2)}`;
+                const value = params?.value;
+                if (value == null) return '-';
+                return `$${value.toFixed(2)}`;
             },
         },
         {
@@ -97,8 +105,9 @@ function UserPromotionPage() {
             headerName: 'Rate',
             width: 100,
             valueFormatter: (params) => {
-            if (!params.value) return '-';
-            return `${(params.value * 100).toFixed(0)}%`;
+                const value = params?.value;
+                if (value == null) return '-';
+                return `${(value * 100).toFixed(0)}%`;
             },
         },
         {
