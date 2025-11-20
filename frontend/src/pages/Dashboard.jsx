@@ -2,17 +2,17 @@ import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import AppNavbar from '../components/AppNavbar';
-import Header from '../components/Header';
-import MainGrid from '../components/MainGrid';
-import SideMenu from '../components/SideMenu';
-import AppTheme from '../contexts/theme/AppTheme';
+import AppNavbar from './components/AppNavbar';
+import Header from './components/Header';
+import MainGrid from './components/MainGrid';
+import SideMenu from './components/SideMenu';
+import AppTheme from '../shared-theme/AppTheme';
 import {
   chartsCustomizations,
   dataGridCustomizations,
   datePickersCustomizations,
   treeViewCustomizations,
-} from '../contexts/theme/customizations';
+} from './theme/customizations';
 import { useAuth } from '../contexts/AuthContext';
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";

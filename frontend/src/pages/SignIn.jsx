@@ -11,9 +11,9 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from '../components/ForgotPassword';
-import AppTheme from '../contexts/theme/AppTheme';
-import ColorModeSelect from '../contexts/theme/ColorModeSelect';
-import { SitemarkIcon } from '../components/CustomIcons';
+import AppTheme from '../shared-theme/AppTheme';
+import ColorModeSelect from '../shared-theme/ColorModeSelect';
+import { SitemarkIcon } from './components/CustomIcons';
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from "react-router-dom";
 
@@ -71,10 +71,6 @@ export default function SignIn(props) {
   const navigate = useNavigate();
 
   const handleForgetPassword = () => setOpen(true);
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const handleSignIn = async (event) => {
     event.preventDefault();
@@ -166,7 +162,7 @@ export default function SignIn(props) {
                 color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
-            <ForgotPassword open={open} handleClose={handleClose} />
+            <ForgotPassword open={open} setOpen={setOpen} />
             <Button
               type="submit"
               fullWidth

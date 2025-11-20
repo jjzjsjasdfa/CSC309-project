@@ -1,6 +1,6 @@
 import './Layout.css';
 import {Link, Outlet} from "react-router-dom";
-import ColorModeSelect from '../contexts/theme/ColorModeSelect';
+import ColorModeSelect from '../shared-theme/ColorModeSelect';
 
 const Layout = () => {
   return <>

@@ -11,13 +11,19 @@ import {useEffect} from "react";
 
 const VITE_BACKEND_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
-function ForgotPassword({ open, handleClose }) {
+function ForgotPassword({ open, setOpen }) {
   const [resetError, setResetError] = React.useState(false);
   const [dialogContentText, setDialogContentText] = React.useState('');
 
   useEffect(() => {
-    setDialogContentText('Enter the account&apos;s utorid, and we&apos;ll give you a reset token.');
+    setDialogContentText('Enter the account\'s utorid, and we\'ll give you a reset token.');
   }, []);
+
+  const handleClose = () => {
+    setOpen(false);
+    setResetError(false);
+    setDialogContentText('Enter the account\'s utorid, and we\'ll give you a reset token.');
+  };
 
   return (
     <Dialog
@@ -55,13 +61,18 @@ function ForgotPassword({ open, handleClose }) {
           },
           sx: { backgroundImage: 'none' },
         },
+        TransitionProps: { onExited: () => {
+            setResetError(false);
+            setDialogContentText("Enter the account's utorid, and we'll give you a reset token.");
+          },
+        },
       }}
     >
       <DialogTitle>Reset password</DialogTitle>
       <DialogContent
         sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}
       >
-        <DialogContentText sx={{color: (theme) => resetError ? theme.palette.error.main : theme.palette.primary.primary}}>
+        <DialogContentText sx={{color: (theme) => resetError ? theme.palette.error.main : theme.palette.primary}}>
           { dialogContentText }
         </DialogContentText>
         <OutlinedInput
