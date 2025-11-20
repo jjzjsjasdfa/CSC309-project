@@ -21,19 +21,24 @@ function ForgotPassword({ open, setOpen }) {
 
   const handleClose = () => {
     setOpen(false);
-    setResetError(false);
-    setDialogContentText('Enter the account\'s utorid, and we\'ll give you a reset token.');
   };
 
   return (
     <Dialog
       open={open}
       onClose={handleClose}
+      TransitionProps={{
+        onExited: () => {
+          setResetError(false);
+          setDialogContentText("Enter the account's utorid, and we'll give you a reset token.");
+        },
+      }}
       slotProps={{
         paper: {
           component: 'form',
           onSubmit: async (event) => {
             event.preventDefault();
+            event.stopPropagation();
 
             // get reset token
             const formData = new FormData(event.currentTarget);
@@ -48,7 +53,7 @@ function ForgotPassword({ open, setOpen }) {
             // failure
             if (!res.ok) {
               setResetError(true);
-              setDialogContentText(`Error: ${data.error}`);
+              setDialogContentText(`${data.error}`);
               return;
             }
 
@@ -59,12 +64,13 @@ function ForgotPassword({ open, setOpen }) {
             setResetError(false);
             setDialogContentText(`We have sent you the email!`);
           },
-          sx: { backgroundImage: 'none' },
-        },
-        TransitionProps: { onExited: () => {
-            setResetError(false);
-            setDialogContentText("Enter the account's utorid, and we'll give you a reset token.");
-          },
+          sx: {
+            backgroundImage: 'none',
+            width: '500px',
+            maxWidth: '80%',
+            height: '230px',
+            maxHeight: '40%'
+          }
         },
       }}
     >
