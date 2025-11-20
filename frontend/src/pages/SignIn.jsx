@@ -13,7 +13,7 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from '../components/ForgotPassword';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
-import { SitemarkIcon } from './dashboard/components/CustomIcons';
+import { SitemarkIcon } from './components/CustomIcons';
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from "react-router-dom";
 

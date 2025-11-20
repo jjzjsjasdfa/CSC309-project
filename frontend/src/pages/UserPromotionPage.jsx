@@ -3,6 +3,8 @@ import { useAuth } from "../contexts/AuthContext";
 import { Container, Typography, Grid, Card, CardContent, Button } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import Divider from '@mui/material/Divider';
 
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
@@ -62,21 +64,30 @@ function UserPromotionPage() {
     const rows = promotions.map((promo) => {
     const start = new Date(promo.startTime);
     const end = new Date(promo.endTime);
+    const now = new Date();
 
     const formatDate = (d) =>
         isNaN(d.getTime()) ? '-' : d.toLocaleDateString();
 
-        return {
-            id: promo.id,
-            name: promo.name,
-            description: promo.description,
-            type: promo.type,
-            minSpending: promo.minSpending,
-            rate: promo.rate,
-            points: promo.points,
-            timeRange: `${formatDate(start)} – ${formatDate(end)}`,
-        };
-    });
+    let status = 'active';
+    if (!isNaN(start.getDate() && now < start)) {
+        status = "upcoming";
+    } else if (!isNaN(end.getDate()) && now > end) {
+        status = "expired";
+    }
+
+    return {
+        id: promo.id,
+        name: promo.name,
+        description: promo.description,
+        type: String(promo.type),
+        minSpending: promo.minSpending,
+        rate: promo.rate,
+        points: promo.points,
+        startTime: formatDate(start),
+        endTime: formatDate(end),
+        status,        
+    };});
 
     const columns = [
         { field: 'name', headerName: 'Name', flex: 1, minWidth: 150 },
@@ -87,7 +98,47 @@ function UserPromotionPage() {
             width: 160,
             valueFormatter: (params) => {
                 const raw = params.value;
-                return typeLabels[raw] || raw;
+                const label = typeLabels[raw] || raw;
+                const colorMap = {
+                    "automatic": 'info',
+                    'on-time': 'secondary',
+                };
+                return (
+                    <Chip
+                        label={label}
+                        color={colorMap[raw] || 'default'}
+                        size="small"
+                    />
+                )    
+            },
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            width: 150,
+            renderCell: (params) => {
+            const status = params.value;
+            if (!status) return '-';
+
+            const labelMap = {
+                active: 'Active',
+                upcoming: 'Upcoming',
+                expired: 'Expired',
+            };
+            const colorMap = {
+                active: 'success',
+                upcoming: 'warning',
+                expired: 'default',
+            };
+
+            return (
+                <Chip
+                label={labelMap[status] || status}
+                color={colorMap[status] || 'default'}
+                variant={status === 'expired' ? 'outlined' : 'filled'}
+                size="small"
+                />
+            );
             },
         },
         {
@@ -116,10 +167,14 @@ function UserPromotionPage() {
             width: 100,
         },
         {
-            field: 'timeRange',
-            headerName: 'Active Period',
-            flex: 2,
-            minWidth: 220,
+            field: 'startDate',
+            headerName: 'Start Date',
+            width: 140,
+        },
+        {
+            field: 'endDate',
+            headerName: 'End Date',
+            width: 140,
         },
     ];
 
@@ -128,6 +183,21 @@ function UserPromotionPage() {
             <Typography variant="h4" gutterBottom>
                 Available Promotions
             </Typography>
+
+            {/* Summary card */}
+            <Card sx={{ mb: 3, borderRadius: 3 }}>
+                <CardContent>
+                <Typography variant="subtitle2" color="text.secondary">
+                    Total Promotions
+                </Typography>
+                <Typography variant="h3" sx={{ my: 1 }}>
+                    {promotions.length}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    Total promotions currently in the system
+                </Typography>
+                </CardContent>
+            </Card>
 
             {/* Loading */}
             {loading && <Typography>Loading promotions...</Typography>}
@@ -157,15 +227,28 @@ function UserPromotionPage() {
 
             {/* List */}
             {!loading && !error && promotions.length > 0 && (
-                <Box sx={{ height: 500, width: '100%', mt: 2 }}>
+                <Box sx={{ height: '70vh', width: '100%', mt: 3 }}>
                     <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSizeOptions={[5, 10, 25]}
-                    initialState={{
-                        pagination: { paginationModel: { pageSize: 10, page: 0 } },
-                    }}
-                    disableRowSelectionOnClick
+                        rows={rows}
+                        columns={columns}
+                        pageSizeOptions={[5, 10, 25]}
+                        initialState={{
+                            pagination: { paginationModel: { pageSize: 10, page: 0 } },
+                        }}
+                        disableRowSelectionOnClick
+                        getRowClassName={(params) => `promo-row--${params.row.status}`}
+                        sx={{
+                            '& .promo-row--expired': {
+                            opacity: 0.5,
+                            },
+                            '& .promo-row--upcoming': {
+                            bgcolor: 'rgba(255, 215, 0, 0.12)',
+                            },
+                            '& .promo-row--active': {
+                            bgcolor: 'rgba(76, 175, 80, 0.04)',
+                            },
+                        }}
+                        density="comfortable"
                     />
                 </Box>
             )}
