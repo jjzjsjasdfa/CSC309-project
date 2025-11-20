@@ -38,6 +38,7 @@ function ForgotPassword({ open, setOpen }) {
           component: 'form',
           onSubmit: async (event) => {
             event.preventDefault();
+            event.stopPropagation();
 
             // get reset token
             const formData = new FormData(event.currentTarget);
