@@ -4,7 +4,7 @@ import { inputLabelClasses } from '@mui/material/InputLabel';
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 import { formHelperTextClasses } from '@mui/material/FormHelperText';
 import { iconButtonClasses } from '@mui/material/IconButton';
-import { brand } from '../../../shared-theme/themePrimitives';
+import { brand } from '../../../../shared-theme/themePrimitives';
 
 /* eslint-disable import/prefer-default-export */
 export const formInputCustomizations: Components<Theme> = {

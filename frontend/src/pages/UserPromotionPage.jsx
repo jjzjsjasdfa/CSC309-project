@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Container, Typography, Grid, Card, CardContent, Button } from "@mui/material";
+import { DataGrid } from '@mui/x-data-grid';
+import Box from '@mui/material/Box';
 
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
@@ -52,6 +54,65 @@ function UserPromotionPage() {
             window.location.reload();
         }
     };
+    const rows = promotions.map((promo) => {
+    const start = new Date(promo.startTime);
+    const end = new Date(promo.endTime);
+
+    const formatDate = (d) =>
+        isNaN(d.getTime()) ? '-' : d.toLocaleDateString();
+
+    return {
+        id: promo.id,
+        name: promo.name,
+        description: promo.description,
+        type: promo.type,
+        minSpending: promo.minSpending,
+        rate: promo.rate,
+        points: promo.points,
+        timeRange: `${formatDate(start)} – ${formatDate(end)}`,
+    };
+    });
+
+    const columns = [
+        { field: 'name', headerName: 'Name', flex: 1, minWidth: 150 },
+        { field: 'description', headerName: 'Description', flex: 2, minWidth: 200 },
+        {
+            field: 'type',
+            headerName: 'Type',
+            width: 120,
+            valueFormatter: (params) =>
+            params.value === 'automatic' ? 'Automatic' : 'Code',
+        },
+        {
+            field: 'minSpending',
+            headerName: 'Min Spending',
+            width: 140,
+            valueFormatter: (params) => {
+            if (params.value == null) return '-';
+            return `$${params.value.toFixed(2)}`;
+            },
+        },
+        {
+            field: 'rate',
+            headerName: 'Rate',
+            width: 100,
+            valueFormatter: (params) => {
+            if (!params.value) return '-';
+            return `${(params.value * 100).toFixed(0)}%`;
+            },
+        },
+        {
+            field: 'points',
+            headerName: 'Points',
+            width: 100,
+        },
+        {
+            field: 'timeRange',
+            headerName: 'Active Period',
+            flex: 2,
+            minWidth: 220,
+        },
+    ];
 
     return (
         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -87,22 +148,17 @@ function UserPromotionPage() {
 
             {/* List */}
             {!loading && !error && promotions.length > 0 && (
-                <Grid container spacing={3} sx={{ mt: 2 }}>
-                    {promotions.map((promo) => (
-                        <Grid item key={promo.id} xs={12} sm={6} md={4}>
-                            <Card>
-                                <CardContent>
-                                    <Typography variant="h6" gutterBottom>
-                                        {promo.name}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {promo.description}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
+                <Box sx={{ height: 500, width: '100%', mt: 2 }}>
+                    <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    pageSizeOptions={[5, 10, 25]}
+                    initialState={{
+                        pagination: { paginationModel: { pageSize: 10, page: 0 } },
+                    }}
+                    disableRowSelectionOnClick
+                    />
+                </Box>
             )}
         </Container>
     );

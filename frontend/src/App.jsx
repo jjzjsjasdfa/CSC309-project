@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import {AuthProvider} from "./contexts/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import UserPromotionPage from "./pages/UserPromotionPage";
+import CrudDashboard from "./pages/CrudDashboard"
+import PromotionsDashboard from "./pages/PromotionsDashboard";
 
 
 export default function App() {
@@ -21,7 +23,7 @@ export default function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<SignIn disableCustomTheme={false}/>} />
               <Route path="me" element={<Dashboard />} />
-              <Route path="me/promotions" element={<UserPromotionPage />} />
+              <Route path="me/promotions" element={<PromotionsDashboard />} />
               {/*
               <Route path="manager/promotions" element={<ManagerPromotionsPage />} />
               <Route path="manager/promotions/new" element={<PromotionFormPage />} />
