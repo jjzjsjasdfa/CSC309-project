@@ -21,7 +21,6 @@ function UserPromotionPage() {
                 })
 
                 const data = await res.json();
-                console.log("backend /promotions response:", data);
 
                 if (!res.ok) {
                     throw new Error(data.error || `HTTP ${res.status}`);
@@ -29,7 +28,6 @@ function UserPromotionPage() {
 
                 setPromotions(data.results || []);
             } catch (err) {
-                console.error("Error loading promotions:", err);
                 setError(err.message || "Failed to load promotions");
             } finally {
                 setLoading(false);
@@ -38,8 +36,6 @@ function UserPromotionPage() {
 
         if (token) {
             loadPromotions();
-        } else {
-            console.log("No token yet, not calling /promotions");
         }
     }, [token]);
 
@@ -48,10 +44,6 @@ function UserPromotionPage() {
             <Typography variant="h4" gutterBottom>
                 Available Promotions
             </Typography>
-
-            <Typography>Has token: {token ? "yes" : "no"}</Typography>
-            <Typography>Promotions length: {promotions.length}</Typography>
-            <pre>{JSON.stringify(promotions, null, 2)}</pre>
 
             {/* Loading */}
             {loading && <Typography>Loading promotions...</Typography>}
