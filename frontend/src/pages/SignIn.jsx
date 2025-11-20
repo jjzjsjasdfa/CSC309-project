@@ -97,7 +97,7 @@ export default function SignIn(props) {
       }
 
       // authentication is successful
-      storeToken({ token: responseData.token });
+      storeToken(responseData.token);
       navigate("/me");
     } catch (err) {
       console.error("Error:", err);

@@ -11,12 +11,15 @@ import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import { Link as RouterLink } from 'react-router-dom';
 
 const mainListItems = [
   { text: 'Home', icon: <HomeRoundedIcon /> },
   { text: 'Analytics', icon: <AnalyticsRoundedIcon /> },
   { text: 'Clients', icon: <PeopleRoundedIcon /> },
   { text: 'Tasks', icon: <AssignmentRoundedIcon /> },
+  { text: 'Promotions', icon: <LocalOfferIcon />, href: '/me/promotions' },
 ];
 
 const secondaryListItems = [
@@ -31,7 +34,8 @@ export default function MenuContent() {
       <List dense>
         {mainListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton selected={index === 0}>
+            <ListItemButton component={RouterLink} to={item.href || "#"}
+              selected={window.location.pathname === item.href}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItemButton>

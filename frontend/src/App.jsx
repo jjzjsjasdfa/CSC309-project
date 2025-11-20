@@ -8,6 +8,7 @@ import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
 import {AuthProvider} from "./contexts/AuthContext";
 import Dashboard from "./pages/Dashboard";
+import PromotionsDashboard from "./pages/PromotionsDashboard";
 
 
 export default function App() {
@@ -20,6 +21,11 @@ export default function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<SignIn disableCustomTheme={false}/>} />
               <Route path="me" element={<Dashboard />} />
+              <Route path="me/promotions" element={<PromotionsDashboard />} />
+              {/*
+              <Route path="manager/promotions" element={<ManagerPromotionsPage />} />
+              <Route path="manager/promotions/new" element={<PromotionFormPage />} />
+              <Route path="manager/promotions/:id" element={<PromotionFormPage />} />*/}
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

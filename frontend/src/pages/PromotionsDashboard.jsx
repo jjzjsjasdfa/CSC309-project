@@ -1,10 +1,11 @@
+// src/pages/PromotionsDashboard.jsx
 import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
+
 import AppNavbar from './components/AppNavbar';
 import Header from './components/Header';
-import MainGrid from './components/MainGrid';
 import SideMenu from './components/SideMenu';
 import AppTheme from '../shared-theme/AppTheme';
 import {
@@ -13,10 +14,12 @@ import {
   datePickersCustomizations,
   treeViewCustomizations,
 } from './theme/customizations';
-import { useAuth } from '../contexts/AuthContext.jsx';
-import {useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
 
+import { useAuth } from '../contexts/AuthContext.jsx';
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+
+import UserPromotionPage from "./UserPromotionPage";
 const xThemeComponents = {
   ...chartsCustomizations,
   ...dataGridCustomizations,
@@ -24,40 +27,15 @@ const xThemeComponents = {
   ...treeViewCustomizations,
 };
 
-const VITE_BACKEND_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-
-export default function Dashboard(props) {
+export default function PromotionsDashboard(props) {
   const navigate = useNavigate();
-  const [user, setUser] = useState({});
-  const { token, storeUserIdAndRole } = useAuth();
+  const { token } = useAuth();
 
   useEffect(() => {
-    if(!token){
+    if (!token) {
       navigate("/");
     }
-    else{
-      const fetchUserData = async () => {
-        try {
-          const res = await fetch(`${VITE_BACKEND_URL}/users/me`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          const data = await res.json();
-
-          if (!res.ok) {
-            console.error(`Error: ${data.message}`);
-          }
-
-          storeUserIdAndRole({ id: data.id, role: data.role });
-          setUser(data);
-        }catch (err) {
-          console.error(`Unexpected error: ${err}`);
-        }
-      }
-    }
-  }, []);
+  }, [token, navigate]);
 
   return (
     <AppTheme {...props} themeComponents={xThemeComponents}>
@@ -65,7 +43,6 @@ export default function Dashboard(props) {
       <Box sx={{ display: 'flex' }}>
         <SideMenu />
         <AppNavbar />
-        {/* Main content */}
         <Box
           component="main"
           sx={(theme) => ({
@@ -86,7 +63,7 @@ export default function Dashboard(props) {
             }}
           >
             <Header />
-            <MainGrid />
+            <UserPromotionPage />
           </Stack>
         </Box>
       </Box>
