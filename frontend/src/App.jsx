@@ -11,8 +11,6 @@ import Dashboard from "./pages/Dashboard";
 import UserPromotionPage from "./pages/UserPromotionPage";
 import CrudDashboard from "./pages/CrudDashboard"
 import PromotionsDashboard from "./pages/PromotionsDashboard";
-import PromotionsDashboard from "./pages/PromotionsDashboard";
-
 
 export default function App() {
   return (
