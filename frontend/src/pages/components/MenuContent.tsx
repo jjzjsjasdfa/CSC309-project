@@ -15,7 +15,7 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import { Link as RouterLink } from 'react-router-dom';
 
 const mainListItems = [
-  { text: 'Home', icon: <HomeRoundedIcon /> },
+  { text: 'Home', icon: <HomeRoundedIcon />, href: '/me'},
   { text: 'Analytics', icon: <AnalyticsRoundedIcon /> },
   { text: 'Clients', icon: <PeopleRoundedIcon /> },
   { text: 'Tasks', icon: <AssignmentRoundedIcon /> },
