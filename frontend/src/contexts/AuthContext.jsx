@@ -3,32 +3,35 @@ import { createContext, useContext, useState } from "react";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [auth, setAuth] = useState(() => {
-    const saved = localStorage.getItem("auth");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-      }
-    }
-    return { userId: null, role: null, token: null };
+  const [token, setToken] = useState(() => {
+    const storedToken = localStorage.getItem("token");
+    return storedToken ? storedToken : null;
   });
 
-  function login(data) {
-    setAuth((prev) => {
-      const newAuth = { ...prev, ...data };
-      localStorage.setItem("auth", JSON.stringify(newAuth));
-      return newAuth;
-    });
+  function storeToken(token) {
+    setToken(token);
+    localStorage.setItem("token", token);
   }
 
-  function logout() {
-    setAuth({ userId: null, role: null, token: null });
-    localStorage.removeItem("auth");
+  const [userIdAndRole, setUserIdAndRole] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : { userId: null, role: null };
+  });
+
+  function storeUserIdAndRole({ id, role }) {
+    setUserIdAndRole({ id, role });
+    localStorage.setItem("user", JSON.stringify({ id, role }));
+  }
+
+  function removeTokenAndUser() {
+    setToken(null);
+    setUserIdAndRole({ userId: null, role: null });
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   }
 
   return (
-    <AuthContext.Provider value={{ ...auth, login, logout }}>
+    <AuthContext.Provider value={{ token, storeToken, userIdAndRole, storeUserIdAndRole, removeTokenAndUser }}>
       {children}
     </AuthContext.Provider>
   );
