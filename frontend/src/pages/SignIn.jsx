@@ -17,6 +17,8 @@ import { SitemarkIcon } from '../components/CustomIcons';
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from "react-router-dom";
 
+const VITE_BACKEND_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -65,58 +67,30 @@ export default function SignIn(props) {
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
-  const { login } = useAuth();
+  const { storeToken } = useAuth();
   const navigate = useNavigate();
 
-  const handleClickOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleForgetPassword = () => setOpen(true);
 
-  const validateInputs = () => {
-    const utorid = document.getElementById('utorid');
-    const password = document.getElementById('password');
-
-    let isValid = true;
-
-    if (!utorid.value || !/^[a-zA-Z0-9]{7,8}$/.test(utorid.value)) {
-      setUtoridError(true);
-      setUtoridErrorMessage('Please enter a valid utorid.');
-      isValid = false;
-    } else {
-      setUtoridError(false);
-      setUtoridErrorMessage('');
-    }
-
-    if (!password.value || password.value.length < 8 || password.value.length > 20) {
-      setPasswordError(true);
-      setPasswordErrorMessage('Password must be 8-20 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
-    }
-
-    return isValid;
+  const handleClose = () => {
+    setOpen(false);
   };
 
-  const handleSubmit = async (event) => {
+  const handleSignIn = async (event) => {
     event.preventDefault();
-
-    if (!validateInputs()) return;
 
     const data = new FormData(event.currentTarget);
     const utorid = data.get('utorid');
     const password = data.get('password');
 
     try {
-      const res = await fetch("/auth/tokens", {
+      const res = await fetch(`${VITE_BACKEND_URL}/auth/tokens`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ utorid, password }),
+        body: JSON.stringify({ utorid, password })
       });
 
       const responseData = await res.json();
-      console.log(responseData);
-
 
       // authentication failed
       if (!res.ok) {
@@ -126,8 +100,8 @@ export default function SignIn(props) {
         return;
       }
 
-      // authentication successful
-      login({ token: responseData.token });
+      // authentication is successful
+      storeToken({ token: responseData.token });
       navigate("/me");
     } catch (err) {
       console.error("Error:", err);
@@ -150,7 +124,7 @@ export default function SignIn(props) {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSignIn}
             noValidate
             sx={{
               display: 'flex',
@@ -197,18 +171,17 @@ export default function SignIn(props) {
               type="submit"
               fullWidth
               variant="contained"
-              onClick={validateInputs}
             >
               Sign in
             </Button>
             <Link
               component="button"
               type="button"
-              onClick={handleClickOpen}
+              onClick={handleForgetPassword}
               variant="body2"
               sx={{ alignSelf: 'center' }}
             >
-              Forgot your password?
+              Forgot the password?
             </Link>
           </Box>
         </Card>

@@ -12,6 +12,8 @@
     "@emotion/styled": "latest",
     "@mui/material": "latest",
     "@mui/icons-material": "latest",
+    "@mui/x-charts": "latest",
+    "@mui/x-data-grid": "latest",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "latest"

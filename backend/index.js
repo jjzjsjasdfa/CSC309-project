@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 'use strict';
 require('dotenv').config();
+const cors = require('cors');
+
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const port = (() => {
     const args = process.argv;
@@ -21,6 +24,12 @@ const port = (() => {
 
 const express = require("express");
 const app = express();
+
+app.use(cors({
+  origin: FRONTEND_URL,
+  methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
 app.use(express.json());
 

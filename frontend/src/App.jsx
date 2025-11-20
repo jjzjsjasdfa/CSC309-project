@@ -5,9 +5,10 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Layout from './components/Layout';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
 import {AuthProvider} from "./contexts/AuthContext";
-import Profile from "./pages/Profile";
+import Dashboard from "./pages/Dashboard";
 
 
 export default function App() {
@@ -19,7 +20,8 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<SignIn disableCustomTheme={false}/>} />
-              <Route path="me" element={<Profile />} />
+              <Route path="signUp" element={<SignUp disableCustomTheme={false}/>} />
+              <Route path="me" element={<Dashboard />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
