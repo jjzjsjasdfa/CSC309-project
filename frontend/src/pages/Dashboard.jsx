@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack';
 import AppNavbar from './components/AppNavbar';
 import Header from './components/Header';
 import MainGrid from './components/MainGrid';
-import SideMenu from './components/SideMenu';
+import DashboardSideMenu from './components/DashboardSideMenu';
 import AppTheme from '../shared-theme/AppTheme';
 import {
   chartsCustomizations,
@@ -44,26 +44,29 @@ export default function Dashboard(props) {
             },
           });
 
-          const data = await res.json();
+          const user = await res.json();
+          console.log(user);
 
           if (!res.ok) {
-            console.error(`Error: ${data.message}`);
+            console.error(`Error: ${user.message}`);
           }
 
-          storeUserIdAndRole({ id: data.id, role: data.role });
-          setUser(data);
+          storeUserIdAndRole({ id: user.id, role: user.role });
+          setUser(user);
         }catch (err) {
           console.error(`Unexpected error: ${err}`);
         }
-      }
+      };
+
+      fetchUserData();
     }
-  }, []);
+  }, [token, navigate]);
 
   return (
     <AppTheme {...props} themeComponents={xThemeComponents}>
       <CssBaseline enableColorScheme />
       <Box sx={{ display: 'flex' }}>
-        <SideMenu />
+        <DashboardSideMenu avatar={user.avatar} name={user.name} email={user.email} />
         <AppNavbar />
         {/* Main content */}
         <Box
