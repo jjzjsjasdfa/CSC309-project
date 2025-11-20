@@ -8,7 +8,7 @@ import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
 import {AuthProvider} from "./contexts/AuthContext";
 import Dashboard from "./pages/Dashboard";
-import UserPromotionPage from "./pages/promotions/UserPromotionPage";
+import UserPromotionPage from "./pages/UserPromotionPage";
 
 
 export default function App() {

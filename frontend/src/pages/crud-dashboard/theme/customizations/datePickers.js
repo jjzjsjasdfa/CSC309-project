@@ -1,12 +1,11 @@
-import { alpha, Theme } from '@mui/material/styles';
-import type { PickersProComponents } from '@mui/x-date-pickers-pro/themeAugmentation';
-import type { PickerComponents } from '@mui/x-date-pickers/themeAugmentation';
+import { alpha } from '@mui/material/styles';
+
 import { menuItemClasses } from '@mui/material/MenuItem';
 import { pickersDayClasses, yearCalendarClasses } from '@mui/x-date-pickers';
 import { gray, brand } from '../../../shared-theme/themePrimitives';
 
 /* eslint-disable import/prefer-default-export */
-export const datePickersCustomizations: PickersProComponents<Theme> & PickerComponents<Theme> = {
+export const datePickersCustomizations = {
   MuiPickerPopper: {
     styleOverrides: {
       paper: ({ theme }) => ({
@@ -31,7 +30,6 @@ export const datePickersCustomizations: PickersProComponents<Theme> & PickerComp
   },
   MuiPickersArrowSwitcher: {
     styleOverrides: {
-      spacer: { width: 16 },
       button: ({ theme }) => ({
         backgroundColor: 'transparent',
         color: (theme.vars || theme).palette.grey[500],
@@ -136,6 +134,7 @@ export const datePickersCustomizations: PickersProComponents<Theme> & PickerComp
         fontSize: theme.typography.body1.fontSize,
         color: (theme.vars || theme).palette.grey[600],
         padding: theme.spacing(0.5),
+        marginTop: theme.spacing(0.5),
         borderRadius: theme.shape.borderRadius,
         '&:hover': {
           backgroundColor: (theme.vars || theme).palette.action.hover,

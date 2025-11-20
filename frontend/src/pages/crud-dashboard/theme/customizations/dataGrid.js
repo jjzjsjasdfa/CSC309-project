@@ -4,6 +4,7 @@ import { alpha } from '@mui/material/styles';
 import { menuItemClasses } from '@mui/material/MenuItem';
 import { listItemIconClasses } from '@mui/material/ListItemIcon';
 import { iconButtonClasses } from '@mui/material/IconButton';
+import { inputBaseClasses } from '@mui/material/InputBase';
 import { checkboxClasses } from '@mui/material/Checkbox';
 import { listClasses } from '@mui/material/List';
 import { gridClasses } from '@mui/x-data-grid';
@@ -129,6 +130,24 @@ export const dataGridCustomizations = {
         justifyContent: 'space-between',
       },
       columnHeaderDraggableContainer: { paddingRight: 2 },
+      toolbar: ({ theme }) => ({
+        backgroundColor: (theme.vars || theme).palette.background.paper,
+      }),
+      toolbarQuickFilter: {
+        [`& .${inputBaseClasses.root}`]: {
+          marginLeft: 6,
+          marginRight: 6,
+        },
+        [`& .${iconButtonClasses.root}`]: {
+          height: '36px',
+          width: '36px',
+        },
+        [`& .${iconButtonClasses.edgeEnd}`]: {
+          border: 'none',
+          height: '28px',
+          width: '28px',
+        },
+      },
     },
   },
 };

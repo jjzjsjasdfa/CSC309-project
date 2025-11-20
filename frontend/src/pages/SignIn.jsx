@@ -13,7 +13,7 @@ import { styled } from '@mui/material/styles';
 import ForgotPassword from '../components/ForgotPassword';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
-import { SitemarkIcon } from './components/CustomIcons';
+import { SitemarkIcon } from './dashboard/components/CustomIcons';
 import { useAuth } from '../contexts/AuthContext'
 import { useNavigate } from "react-router-dom";
 
@@ -97,7 +97,7 @@ export default function SignIn(props) {
       }
 
       // authentication is successful
-      storeToken({ token: responseData.token });
+      storeToken(responseData.token);
       navigate("/me");
     } catch (err) {
       console.error("Error:", err);
