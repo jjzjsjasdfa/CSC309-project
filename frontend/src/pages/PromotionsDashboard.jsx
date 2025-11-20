@@ -4,16 +4,16 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 
-import AppNavbar from './dashboard/components/AppNavbar';
-import Header from './dashboard/components/Header';
-import SideMenu from './dashboard/components/SideMenu';
+import AppNavbar from './components/AppNavbar';
+import Header from './components/Header';
+import SideMenu from './components/SideMenu';
 import AppTheme from '../shared-theme/AppTheme';
 import {
   chartsCustomizations,
   dataGridCustomizations,
   datePickersCustomizations,
   treeViewCustomizations,
-} from './theme/customizations/index.js';
+} from './theme/customizations';
 
 import { useAuth } from '../contexts/AuthContext.jsx';
 import { useNavigate } from "react-router-dom";

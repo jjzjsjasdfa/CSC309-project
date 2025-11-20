@@ -12,7 +12,7 @@ import {
   dataGridCustomizations,
   datePickersCustomizations,
   treeViewCustomizations,
-} from './theme/customizations/index.js';
+} from './theme/customizations';
 import { useAuth } from '../contexts/AuthContext.jsx';
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
