@@ -56,7 +56,7 @@ export default function PromotionsDashboard(props) {
           <Stack
             spacing={2}
             sx={{
-              alignItems: 'center',
+              alignItems: 'stretch',
               mx: 3,
               pb: 5,
               mt: { xs: 8, md: 0 },
