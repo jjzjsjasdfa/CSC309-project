@@ -1,4 +1,3 @@
-// src/pages/PromotionsDashboard.jsx
 import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
@@ -29,7 +28,8 @@ const xThemeComponents = {
 
 export default function PromotionsDashboard(props) {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, currentUser } = useAuth();
+  const user = currentUser;
 
   useEffect(() => {
     if (!token) {
@@ -41,7 +41,7 @@ export default function PromotionsDashboard(props) {
     <AppTheme {...props} themeComponents={xThemeComponents}>
       <CssBaseline enableColorScheme />
       <Box sx={{ display: 'flex' }}>
-        <SideMenu />
+        <SideMenu avatar={user.avatar} name={user.name} email={user.email} />
         <AppNavbar />
         <Box
           component="main"
@@ -51,6 +51,7 @@ export default function PromotionsDashboard(props) {
               ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
               : alpha(theme.palette.background.default, 1),
             overflow: 'auto',
+            pt: { xs: '64px', md: 0 }
           })}
         >
           <Stack
