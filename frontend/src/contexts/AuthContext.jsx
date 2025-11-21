@@ -13,25 +13,25 @@ export function AuthProvider({ children }) {
     localStorage.setItem("token", token);
   }
 
-  const [userIdAndRole, setUserIdAndRole] = useState(() => {
+  const [currentUser, setCurrentUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : { userId: null, role: null };
+    return storedUser ? JSON.parse(storedUser) : {};
   });
 
-  function storeUserIdAndRole({ id, role }) {
-    setUserIdAndRole({ id, role });
-    localStorage.setItem("user", JSON.stringify({ id, role }));
+  function storeCurrentUser(user) {
+    setCurrentUser(user);
+    localStorage.setItem("user", JSON.stringify(user));
   }
 
   function removeTokenAndUser() {
     setToken(null);
-    setUserIdAndRole({ userId: null, role: null });
+    setCurrentUser({});
     localStorage.removeItem("token");
     localStorage.removeItem("user");
   }
 
   return (
-    <AuthContext.Provider value={{ token, storeToken, userIdAndRole, storeUserIdAndRole, removeTokenAndUser }}>
+    <AuthContext.Provider value={{ token, storeToken, currentUser, storeCurrentUser, removeTokenAndUser }}>
       {children}
     </AuthContext.Provider>
   );

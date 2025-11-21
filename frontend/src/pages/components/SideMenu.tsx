@@ -2,15 +2,13 @@ import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import MuiDrawer, { drawerClasses } from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import SelectContent from './SelectContent';
 import MenuContent from './MenuContent';
-import CardAlert from './CardAlert';
-import OptionsMenu from './OptionsMenu';
+import Tooltip from '@mui/material/Tooltip';
 
 const drawerWidth = 240;
+
 
 const Drawer = styled(MuiDrawer)({
   width: drawerWidth,
@@ -23,7 +21,7 @@ const Drawer = styled(MuiDrawer)({
   },
 });
 
-export default function SideMenu() {
+export default function SideMenu({ avatar, name, email }) {
   return (
     <Drawer
       variant="permanent"
@@ -36,16 +34,6 @@ export default function SideMenu() {
     >
       <Box
         sx={{
-          display: 'flex',
-          mt: 'calc(var(--template-frame-height, 0px) + 4px)',
-          p: 1.5,
-        }}
-      >
-        <SelectContent />
-      </Box>
-      <Divider />
-      <Box
-        sx={{
           overflow: 'auto',
           height: '100%',
           display: 'flex',
@@ -53,7 +41,6 @@ export default function SideMenu() {
         }}
       >
         <MenuContent />
-        <CardAlert />
       </Box>
       <Stack
         direction="row"
@@ -67,19 +54,22 @@ export default function SideMenu() {
       >
         <Avatar
           sizes="small"
-          alt="Riley Carter"
-          src="/static/images/avatar/7.jpg"
+          alt="avatar"
+          src={avatar}
           sx={{ width: 36, height: 36 }}
         />
-        <Box sx={{ mr: 'auto' }}>
-          <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-            Riley Carter
-          </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            riley@email.com
-          </Typography>
+        <Box sx={{ mr: 'auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <Tooltip title={name} arrow>
+            <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }} noWrap>
+              {name}
+            </Typography>
+          </Tooltip>
+          <Tooltip title={email} arrow>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>
+              {email}
+            </Typography>
+          </Tooltip>
         </Box>
-        <OptionsMenu />
       </Stack>
     </Drawer>
   );

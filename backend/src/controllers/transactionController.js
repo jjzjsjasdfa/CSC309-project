@@ -84,7 +84,6 @@ const transactionController = {
             }
 
             transactionData.earned = earned;
-            // TODO: check if the points earned is correct
 
             if (createdByUser.suspicious) {
               transactionData.suspicious = true;

@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 function UserPromotionPage() {
-    const { token, userIdAndRole } = useAuth();
+    const { token } = useAuth();
     const [promotions, setPromotions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
