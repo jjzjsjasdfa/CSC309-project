@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import UserPromotionPage from "./pages/UserPromotionPage";
 import CrudDashboard from "./pages/CrudDashboard"
 import PromotionsDashboard from "./pages/PromotionsDashboard";
+import EventsDashboard from "./pages/EventsDashboard"
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
               <Route path="manager/promotions" element={<ManagerPromotionsPage />} />
               <Route path="manager/promotions/new" element={<PromotionFormPage />} />
               <Route path="manager/promotions/:id" element={<PromotionFormPage />} />*/}
+              <Route path="me/events" element={<EventsDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

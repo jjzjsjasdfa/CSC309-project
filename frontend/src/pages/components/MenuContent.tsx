@@ -7,6 +7,7 @@ import Stack from '@mui/material/Stack';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import EventIcon from '@mui/icons-material/Event';
 import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from "react-router";
@@ -14,6 +15,8 @@ import { useNavigate } from "react-router";
 const mainListItems = [
   { text: 'Home', icon: <HomeRoundedIcon />, href: '/me'},
   { text: 'Promotions', icon: <LocalOfferIcon />, href: '/me/promotions' },
+  { text: 'Events', icon: <EventIcon />, href: '/me/events' }
+
 ];
 
 const secondaryListItems = [
