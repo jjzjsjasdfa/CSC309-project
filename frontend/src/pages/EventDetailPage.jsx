@@ -73,17 +73,20 @@ function EventDetailPage() {
 
 	let draftColumns = [
 		{ field: 'name', headerName: 'Name', flex: 2 },
+		{ field: 'description', headerName: 'Description', flex: 2 },
 		{ field: 'location', headerName: 'Location', flex: 2 },
 		{ field: 'startTime', headerName: 'Start Time', flex: 2 },
 		{ field: 'endTime', headerName: 'End Time', flex: 2 },
 		{ field: 'capacity', headerName: 'Capacity', flex: 2 },
-		{ field: 'numGuests', headerName: '# of Guest', flex: 2 },
+
 
 	];
 
 	let columns = (currentUser.role === "manager" || currentUser.role === "superuser")
-		? [...draftColumns, { field: 'published', headerName: 'Published', flex: 2 }]
-		: draftColumns;
+		? [...draftColumns, { field: 'pointsRemain', headerName: 'Points Remain', flex: 2 },
+		{ field: 'pointsAwarded', headerName: 'Points Awarded', flex: 2 },
+		{ field: 'published', headerName: 'Published', flex: 2 }]
+		: [...draftColumns, { field: 'numGuests', headerName: '# of Guest', flex: 2 }];
 
 	const rows = [event];
 	/*
@@ -94,16 +97,41 @@ function EventDetailPage() {
 			];*/
 
 
-	const handleRowClick = (row) => {
-		nav(`/me/events/${row.id}`);
+	const handleDelete = async () => {
+		try {
+			const res = await fetch(`${VITE_BACKEND_URL}/events/${eventId}`, {
+				method: "DELETE",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"Content-Type": "application/json",
+				},
+			});
+			if (!res.ok) {
+            throw new Error(`Failed to delete event: ${res.status}`);
+      }
+			console.log("successfully deleted event: ", eventId);
+			nav("/me/events");
+
+		}
+		catch (err) {
+				setError(err.message || "Failed to load events");
+		}
+
+
 	};
 	return (
 		<Container>
 			<Box sx={{ height: 400, width: '100%' }}>
+				<Typography variant="h6" sx={{ mb: 2 }}>
+					All Events
+				</Typography>
+				<Button sx={{ mt: 2 }}>
+					Update
+				</Button>
+				<Button onClick={handleDelete} sx={{ mt: 2 }}>
+					Delete
+				</Button>
 				<div style={{ display: 'flex', flexDirection: 'column' }}>
-					<Typography variant="h6" sx={{ mb: 2 }}>
-						All Events
-					</Typography>
 					<DataGrid
 						rows={rows}
 						columns={columns}
