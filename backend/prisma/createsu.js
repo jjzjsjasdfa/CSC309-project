@@ -30,20 +30,20 @@ async function main() {
   // create superuser
   // use bcrypt to hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
-  /*
+  
   const superuser = await prisma.user.create({
     data: {
       utorid: utorid,
-      name: "cashier",
+      name: "regular",
       email: email,
       password: hashedPassword,
-      role: 'cashier',
+      role: 'regular',
       verified: true,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
       resetToken: uuid(),
     },
-  });*/
-
+  });
+/*
   const events = await prisma.event.create({
     data: {
       name: "sasuke and naturo cant see for real",
@@ -55,7 +55,7 @@ async function main() {
       pointsRemain: 801,
       published: false
     },
-  })
+  })*/
   const count = await prisma.event.count();
 
   console.log(`superuser "${utorid}" successfully created`);
