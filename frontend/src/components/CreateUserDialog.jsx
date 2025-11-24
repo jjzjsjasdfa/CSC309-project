@@ -117,7 +117,6 @@ function CreateUserDialog({ open, handleClose: setOpen }) {
           fullWidth
         />
         <OutlinedInput
-          autoFocus
           required
           margin="dense"
           value={email}
