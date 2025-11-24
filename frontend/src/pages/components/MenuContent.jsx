@@ -33,9 +33,9 @@ export default function MenuContent() {
       allowedRoles: ['cashier', 'manager', 'superuser'],
     },
     {
-      text: 'My Account',
+      text: 'Edit My Account',
       icon: <Person2Icon />,
-      onClick: () => setUserCreationDialogOpen(true),
+      onClick: () => navigate('/me/account'),
       allowedRoles: null,
     },
     {

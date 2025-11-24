@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import UserPromotionPage from "./pages/UserPromotionPage";
 import CrudDashboard from "./pages/CrudDashboard"
 import PromotionsDashboard from "./pages/PromotionsDashboard";
+import EditMySelfPage from "./pages/EditMySelfPage";
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<SignIn />} />
               <Route path="me" element={<Dashboard />} />
+              <Route path="me/account" element={<EditMySelfPage />} />
               <Route path="me/promotions" element={<PromotionsDashboard />} />
               {/*
               <Route path="manager/promotions" element={<ManagerPromotionsPage />} />
