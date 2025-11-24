@@ -11,7 +11,6 @@ import Dashboard from "./pages/Dashboard";
 import UserPromotionPage from "./pages/UserPromotionPage";
 import CrudDashboard from "./pages/CrudDashboard"
 import PromotionsDashboard from "./pages/PromotionsDashboard";
-import Checkout from "./pages/UserCreationPage/Checkout";
 
 export default function App() {
   return (
@@ -24,7 +23,6 @@ export default function App() {
               <Route index element={<SignIn />} />
               <Route path="me" element={<Dashboard />} />
               <Route path="me/promotions" element={<PromotionsDashboard />} />
-              <Route path="create-user" element={<Checkout />} />
               {/*
               <Route path="manager/promotions" element={<ManagerPromotionsPage />} />
               <Route path="manager/promotions/new" element={<PromotionFormPage />} />
