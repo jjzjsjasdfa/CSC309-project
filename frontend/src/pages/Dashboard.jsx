@@ -107,7 +107,7 @@ export default function Dashboard(props) {
       <CssBaseline enableColorScheme />
       <Box sx={{ display: 'flex' }}>
         <SideMenu avatar={avatarFullUrl} name={user.name} email={user.email} />
-        <AppNavbar />
+        <AppNavbar avatar={avatarFullUrl} name={user.name} />
         {/* Main content */}
         <Box
           component="main"

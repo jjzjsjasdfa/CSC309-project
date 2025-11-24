@@ -110,10 +110,9 @@ export default function EditMySelfPage(props) {
 
   return (
     <AppTheme {...props}>
-      <Box sx={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 1000 }}>
+      <Box sx={{ position: 'fixed', top: '0.75rem', right: '7.75rem', zIndex: 1000 }}>
         <ColorModeIconDropdown />
       </Box>
-
       <Box
         sx={{
           display: 'flex',
