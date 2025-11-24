@@ -20,7 +20,6 @@ function EventDetailPage() {
 	const [event, setEvent] = useState(null);
 	const [error, setError] = useState("");
 
-
 	useEffect(() => {
 		async function loadEvents() {
 			setLoading(true);
@@ -107,14 +106,14 @@ function EventDetailPage() {
 				},
 			});
 			if (!res.ok) {
-            throw new Error(`Failed to delete event: ${res.status}`);
-      }
+				throw new Error(`Failed to delete event: ${res.status}`);
+			}
 			console.log("successfully deleted event: ", eventId);
 			nav("/me/events");
 
 		}
 		catch (err) {
-				setError(err.message || "Failed to load events");
+			setError(err.message || "Failed to load events");
 		}
 
 
@@ -125,12 +124,15 @@ function EventDetailPage() {
 				<Typography variant="h6" sx={{ mb: 2 }}>
 					All Events
 				</Typography>
-				<Button sx={{ mt: 2 }}>
-					Update
-				</Button>
-				<Button onClick={handleDelete} sx={{ mt: 2 }}>
-					Delete
-				</Button>
+				{(currentUser.role === "manager" || currentUser.role === "superuser") && (
+					<Box sx={{ mb: 2 }}>
+						<Button sx={{ mt: 2 }}>
+							Update
+						</Button>
+						<Button onClick={handleDelete} sx={{ mt: 2 }}>
+							Delete
+						</Button>
+					</Box>)}
 				<div style={{ display: 'flex', flexDirection: 'column' }}>
 					<DataGrid
 						rows={rows}

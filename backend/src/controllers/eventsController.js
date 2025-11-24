@@ -41,8 +41,8 @@ const eventController = {
   async getEvents(req, res){
     try {
       const present = new Date();
-      const page  = Number.isInteger(+req.query.page)  && +req.query.page  > 0 ? +req.query.page  : 1;
-      const limit = Number.isInteger(+req.query.limit) && +req.query.limit > 0 ? +req.query.limit : 10;
+      //const page  = Number.isInteger(+req.query.page)  && +req.query.page  > 0 ? +req.query.page  : 1;
+      //const limit = Number.isInteger(+req.query.limit) && +req.query.limit > 0 ? +req.query.limit : 10;
 
       function parseBool(v) {
         if (v === undefined) return undefined;
@@ -87,8 +87,9 @@ const eventController = {
       }
 
       const count = events.length;
-      const start = (page - 1) * limit;
-      const pageItems = events.slice(start, start + limit);
+      //const start = (page - 1) * limit;
+      //const pageItems = events.slice(start, start + limit);
+      const pageItems = events;
 
       const isRegularView = (role === 'regular' || role === 'cashier');
       const results = pageItems.map(ev => {
@@ -177,9 +178,9 @@ const eventController = {
     try {
       let eid = parseInt(req.params.eventId, 10);
       let event = await eventsService.getEventById(eid);
-      if(Boolean(event.published) === true) {
+      /*if(Boolean(event.published) === true) {
         return res.status(400).json({ message: "event already published" });
-      }
+      }*/
       await eventsService.deleteEventById(eid);
       return res.status(204).send();
     }

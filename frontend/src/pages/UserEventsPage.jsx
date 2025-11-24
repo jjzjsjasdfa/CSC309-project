@@ -84,15 +84,16 @@ function UserEventsPage() {
 	};
 	return (
 		<Container>
-			<Box sx={{ height: 400, width: '100%' }}>
+			<Box sx={{ width: '100%' }}>
 				<div style={{ display: 'flex', flexDirection: 'column' }}>
 					<Typography variant="h6" sx={{ mb: 2 }}>
 						All Events
 					</Typography>
 					<DataGrid
+						autoHeight
 						rows={events}
 						columns={columns}
-						pageSizeOptions={[10, 20, 50]}
+						pageSizeOptions={[5, 10, 20, 50]}
 						initialState={{ pagination: { paginationModel: { pageSize: 10, page: 0 } } }}
 						onRowClick={(params) => handleRowClick(params.row)}
 						sx={{
