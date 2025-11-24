@@ -8,7 +8,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import {useEffect} from "react";
-import { useAuth } from '../../contexts/AuthContext.jsx';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const VITE_BACKEND_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 

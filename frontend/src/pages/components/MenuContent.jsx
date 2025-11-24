@@ -13,7 +13,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import * as React from "react";
-import CreateUserDialog from "../components/CreateUserDialog";
+import CreateUserDialog from "../../components/CreateUserDialog";
 
 export default function MenuContent() {
   const { currentUser, removeTokenAndUser } = useAuth();
