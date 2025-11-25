@@ -9,29 +9,35 @@ import DialogTitle from '@mui/material/DialogTitle';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import {useEffect} from "react";
 import { useAuth } from '../contexts/AuthContext.jsx';
+import {useNavigate} from "react-router-dom";
 
 const VITE_BACKEND_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
-function CreateUserDialog({ open, handleClose: setOpen }) {
-  const [utorid, setUtorid] = React.useState('');
-  const [name, setName] = React.useState('');
-  const [email, setEmail] = React.useState('');
+function ChangeMyPasswordDialog({ open, handleClose: setOpen }) {
+  const [oldPassword, setOld] = React.useState('');
+  const [newPassword, setNew] = React.useState('');
+  const [isReset, setIsReset] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [dialogContentText, setDialogContentText] = React.useState('');
+  const navigate = useNavigate();
   const { token } = useAuth();
 
   useEffect(() => {
-    setDialogContentText('Enter the utorid, name, and email of the new user.');
+    setDialogContentText('Enter the old and new password for your account.');
   }, []);
 
   const handleClose = () => {
-    setOpen(false);
+    if(isReset){
+      setIsReset(false);
+      navigate("/")
+    }else{
+      setOpen(false);
+    }
   };
 
   const clearData = () => {
-    setUtorid('');
-    setName('');
-    setEmail('');
+    setOld('');
+    setNew('');
   }
 
   return (
@@ -41,8 +47,9 @@ function CreateUserDialog({ open, handleClose: setOpen }) {
       TransitionProps={{
         onExited: () => {
           clearData();
+          setIsReset(false);
           setError(false);
-          setDialogContentText("Enter the utorid, name, and email of the new user.");
+          setDialogContentText("Enter the old and new password for your account.");
         },
       }}
       slotProps={{
@@ -53,13 +60,12 @@ function CreateUserDialog({ open, handleClose: setOpen }) {
             event.stopPropagation();
 
             const formData = new FormData(event.currentTarget);
-            const utorid = formData.get('utorid');
-            const name = formData.get('name');
-            const email = formData.get('email');
-            const res = await fetch(`${VITE_BACKEND_URL}/users`, {
-              method: "POST",
+            const oldPassword = formData.get('old');
+            const newPassword = formData.get('new');
+            const res = await fetch(`${VITE_BACKEND_URL}/users/me/password`, {
+              method: "PATCH",
               headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ utorid, name, email })
+              body: JSON.stringify({ "old": oldPassword, "new": newPassword })
             })
             const data = await res.json()
 
@@ -73,7 +79,8 @@ function CreateUserDialog({ open, handleClose: setOpen }) {
             // success
             clearData();
             setError(false);
-            setDialogContentText(`User ${name} has been created!`);
+            setDialogContentText(`Password has been changed! Please login again.`);
+            setIsReset(true);
           },
           sx: {
             backgroundImage: 'none',
@@ -85,7 +92,7 @@ function CreateUserDialog({ open, handleClose: setOpen }) {
         },
       }}
     >
-      <DialogTitle>Create New User</DialogTitle>
+      <DialogTitle>Change My Password</DialogTitle>
       <DialogContent
         sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}
       >
@@ -96,37 +103,25 @@ function CreateUserDialog({ open, handleClose: setOpen }) {
           autoFocus
           required
           margin="dense"
-          value={utorid}
-          id="utorid"
-          name="utorid"
-          label="utorid"
-          placeholder="utorid"
+          value={oldPassword}
+          id="old"
+          name="old"
+          label="old"
+          placeholder="old password"
           type="text"
-          onChange={(e) => setUtorid(e.target.value)}
+          onChange={(e) => setOld(e.target.value)}
           fullWidth
         />
         <OutlinedInput
           required
           margin="dense"
-          value={name}
-          id="name"
-          name="name"
-          label="name"
-          placeholder="name"
+          value={newPassword}
+          id="new"
+          name="new"
+          label="new"
+          placeholder="new password"
           type="text"
-          onChange={(e) => setName(e.target.value)}
-          fullWidth
-        />
-        <OutlinedInput
-          required
-          margin="dense"
-          value={email}
-          id="email"
-          name="email"
-          label="email"
-          placeholder="email"
-          type="email"
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setNew(e.target.value)}
           fullWidth
         />
       </DialogContent>
@@ -140,9 +135,9 @@ function CreateUserDialog({ open, handleClose: setOpen }) {
   );
 }
 
-CreateUserDialog.propTypes = {
+ChangeMyPasswordDialog.propTypes = {
   handleClose: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
 };
 
-export default CreateUserDialog;
+export default ChangeMyPasswordDialog;
