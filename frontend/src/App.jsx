@@ -16,6 +16,12 @@ import EmployeeList from './pages/CRUD_dashboard/components/EmployeeList';
 import EmployeeShow from './pages/CRUD_dashboard/components/EmployeeShow';
 import EmployeeCreate from './pages/CRUD_dashboard/components/EmployeeCreate';
 import EmployeeEdit from './pages/CRUD_dashboard/components/EmployeeEdit';
+import PromotionList from './pages/CRUD_dashboard/components/PromotionList';
+import PromotionShow from './pages/CRUD_dashboard/components/PromotionShow';
+import PromotionCreate from './pages/CRUD_dashboard/components/PromotionCreate';
+import PromotionEdit from './pages/CRUD_dashboard/components/PromotionEdit';
+
+
 
 export default function App() {
   return (
@@ -35,11 +41,11 @@ export default function App() {
 
             {/* promotion */}
             <Route path="promotions" element={<CrudDashboard />}>
-              <Route index element={<EmployeeList />} />
-              <Route path="new" element={<EmployeeCreate />} />
-              <Route path=":promotionId" element={<EmployeeShow />} />
-              <Route path=":promotionId/edit" element={<EmployeeEdit />} />
-              <Route path="*" element={<EmployeeList />} />
+              <Route index element={<PromotionList />} />
+              <Route path="new" element={<PromotionCreate />} />
+              <Route path=":promotionId" element={<PromotionShow />} />
+              <Route path=":promotionId/edit" element={<PromotionEdit />} />
+              <Route path="*" element={<PromotionList />} />
             </Route>
 
             {/* template */}
