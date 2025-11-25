@@ -368,6 +368,7 @@ const eventController = {
         name: updated.name,
         location: updated.location,
       };
+      if (patch.description !== undefined) out.description = updated.description;
       if (patch.startTime !== undefined) out.startTime = updated.startTime;
       if (patch.endTime !== undefined) out.endTime = updated.endTime;
       if (patch.capacity !== undefined) out.capacity = updated.capacity ?? null;

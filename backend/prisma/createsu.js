@@ -30,14 +30,14 @@ async function main() {
   // create superuser
   // use bcrypt to hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
-  
+
   const superuser = await prisma.user.create({
     data: {
       utorid: utorid,
-      name: "manager",
+      name: "regular",
       email: email,
       password: hashedPassword,
-      role: 'manager',
+      role: 'regular',
       verified: true,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
       resetToken: uuid(),
@@ -45,44 +45,67 @@ async function main() {
   });
 
   const events = await prisma.event.createMany({
-  data: [
-    {
-      name: "Event 1",
-      description: "Description 1",
-      location: "Location 1",
-      startTime: new Date(Date.now()),
-      endTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
-      capacity: 100,
-      pointsRemain: 80,
-      published: false
-    },
-    {
-      name: "Event 2",
-      description: "Description 2",
-      location: "Location 2",
-      startTime: new Date(Date.now()),
-      endTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
-      capacity: 200,
-      pointsRemain: 150,
-      published: true
-    },
-    {
-      name: "Event 3",
-      description: "Description 3",
-      location: "Location 3",
-      startTime: new Date(Date.now()),
-      endTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
-      capacity: 300,
-      pointsRemain: 250,
-      published: false
-    }
-  ]
-});
+    data: [
+      {
+        name: "nihao",
+        description: "Description 1",
+        location: "Location 1",
+        startTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        endTime: new Date(Date.now() + 1009 * 60 * 60 * 24 * 7),
+        capacity: 100,
+        pointsRemain: 80,
+        published: false
+
+      },
+      {
+        name: "hello",
+        description: "Description 2",
+        location: "Location 2",
+        startTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        endTime: new Date(Date.now() + 1009 * 60 * 60 * 24 * 7),
+        capacity: 200,
+        pointsRemain: 150,
+        published: false
+      },
+      {
+        name: "Test Event",
+        description: "Description 3",
+        location: "Location 3",
+        startTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        endTime: new Date(Date.now() + 1009 * 60 * 60 * 24 * 7),
+        capacity: 300,
+        pointsRemain: 250,
+        published: false
+      }
+    ]
+  });
 
   const count = await prisma.event.count();
 
   console.log(`superuser "${utorid}" successfully created`);
   console.log(count);
+
+  await prisma.event.update({
+    where: { id: 46 },
+    data: {
+      organizers: {
+        connect: { id: 6 }
+      }
+    }
+  })
+  const event2 = await prisma.event.findUnique({
+    where: { id: 46 },
+    include: {
+      organizers: true
+    }
+  });
+
+  console.log(event2.organizers);
+  // or print each organizer
+  event2.organizers.forEach(organizer => {
+    console.log(`ID: ${organizer.id}, Name: ${organizer.name}, Email: ${organizer.email}`);
+  });
+
 }
 
 main();
