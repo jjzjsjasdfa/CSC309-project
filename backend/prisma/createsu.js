@@ -105,6 +105,8 @@ async function main() {
   event2.organizers.forEach(organizer => {
     console.log(`ID: ${organizer.id}, Name: ${organizer.name}, Email: ${organizer.email}`);
   });
+  const events4 = await prisma.user.findMany();
+  console.log(events4);
 
 }
 
