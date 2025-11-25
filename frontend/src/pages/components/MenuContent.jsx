@@ -10,6 +10,7 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import AddIcon from '@mui/icons-material/Add';
 import Person2Icon from '@mui/icons-material/Person2';
 import PasswordIcon from '@mui/icons-material/Password';
+import GroupIcon from '@mui/icons-material/Group';
 import { Link as RouterLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -26,6 +27,7 @@ export default function MenuContent() {
   const mainListItems = [
     { text: 'Home', icon: <HomeRoundedIcon />, href: '/me' },
     { text: 'Promotions', icon: <LocalOfferIcon />, href: '/me/promotions' },
+    { text: 'Users', icon: <GroupIcon />, href: '/employees' },
   ];
 
   const secondaryListItems = [
