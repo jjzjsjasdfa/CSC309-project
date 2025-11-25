@@ -24,17 +24,25 @@ export default function App() {
         <CssBaseline />
         <BrowserRouter>
           <Routes>
+            {/* user */}
             <Route path="/" element={<Layout />}>
               <Route index element={<SignIn />} />
               <Route path="me" element={<Dashboard />} />
               <Route path="me/account" element={<EditMySelfPage />} />
               <Route path="me/promotions" element={<PromotionsDashboard />} />
-              {/*
-              <Route path="manager/promotions" element={<ManagerPromotionsPage />} />
-              <Route path="manager/promotions/new" element={<PromotionFormPage />} />
-              <Route path="manager/promotions/:id" element={<PromotionFormPage />} />*/}
               <Route path="*" element={<NotFound />} />
             </Route>
+
+            {/* promotion */}
+            <Route path="promotions" element={<CrudDashboard />}>
+              <Route index element={<EmployeeList />} />
+              <Route path="new" element={<EmployeeCreate />} />
+              <Route path=":promotionId" element={<EmployeeShow />} />
+              <Route path=":promotionId/edit" element={<EmployeeEdit />} />
+              <Route path="*" element={<EmployeeList />} />
+            </Route>
+
+            {/* template */}
             <Route path="employees" element={<CrudDashboard />}>
               <Route index element={<EmployeeList />} />
               <Route path="new" element={<EmployeeCreate />} />
