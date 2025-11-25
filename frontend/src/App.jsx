@@ -9,9 +9,13 @@ import NotFound from "./pages/NotFound";
 import {AuthProvider} from "./contexts/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import UserPromotionPage from "./pages/UserPromotionPage";
-import CrudDashboard from "./pages/CrudDashboard"
 import PromotionsDashboard from "./pages/PromotionsDashboard";
 import EditMySelfPage from "./pages/EditMySelfPage";
+import CrudDashboard from "./pages/CRUD_dashboard/CrudDashboard";
+import EmployeeList from './pages/CRUD_dashboard/components/EmployeeList';
+import EmployeeShow from './pages/CRUD_dashboard/components/EmployeeShow';
+import EmployeeCreate from './pages/CRUD_dashboard/components/EmployeeCreate';
+import EmployeeEdit from './pages/CRUD_dashboard/components/EmployeeEdit';
 
 export default function App() {
   return (
@@ -30,6 +34,13 @@ export default function App() {
               <Route path="manager/promotions/new" element={<PromotionFormPage />} />
               <Route path="manager/promotions/:id" element={<PromotionFormPage />} />*/}
               <Route path="*" element={<NotFound />} />
+            </Route>
+            <Route path="employees" element={<CrudDashboard />}>
+              <Route index element={<EmployeeList />} />
+              <Route path="new" element={<EmployeeCreate />} />
+              <Route path=":employeeId" element={<EmployeeShow />} />
+              <Route path=":employeeId/edit" element={<EmployeeEdit />} />
+              <Route path="*" element={<EmployeeList />} />
             </Route>
           </Routes>
         </BrowserRouter>

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -28,10 +28,10 @@ const Toolbar = styled(MuiToolbar)({
   },
 });
 
-export default function AppNavbar() {
-  const [open, setOpen] = React.useState(false);
+export default function AppNavbar({ avatar, name }) {
+  const [open, setOpen] = useState(false);
 
-  const toggleDrawer = (newOpen: boolean) => () => {
+  const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
 
@@ -72,7 +72,7 @@ export default function AppNavbar() {
           <MenuButton aria-label="menu" onClick={toggleDrawer(true)}>
             <MenuRoundedIcon />
           </MenuButton>
-          <SideMenuMobile open={open} toggleDrawer={toggleDrawer} />
+          <SideMenuMobile open={open} toggleDrawer={toggleDrawer} avatar={avatar} name={name} />
         </Stack>
       </Toolbar>
     </AppBar>

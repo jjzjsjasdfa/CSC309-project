@@ -1,10 +1,8 @@
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Copyright from '../internals/components/Copyright';
-import CustomizedDataGrid from './CustomizedDataGrid';
-import StatCard, { StatCardProps } from './StatCard';
+import RecentTransactionsDataGrid from './RecentTransactionsDataGrid';
+import StatCard from './StatCard';
 
 
 export default function DashboardMainGrid({ data }) {
@@ -28,8 +26,7 @@ export default function DashboardMainGrid({ data }) {
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Recent Transactions
       </Typography>
-      <CustomizedDataGrid />
-      <Copyright sx={{ my: 4 }} />
+      <RecentTransactionsDataGrid />
     </Box>
   );
 }

@@ -9,33 +9,44 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import AddIcon from '@mui/icons-material/Add';
 import Person2Icon from '@mui/icons-material/Person2';
+import PasswordIcon from '@mui/icons-material/Password';
+import GroupIcon from '@mui/icons-material/Group';
 import { Link as RouterLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import * as React from "react";
-import CreateUserDialog from "../components/CreateUserDialog";
+import CreateUserDialog from "../../components/CreateUserDialog";
+import ChangeMyPasswordDialog from "../../components/ChangeMyPasswordDialog";
 
 export default function MenuContent() {
   const { currentUser, removeTokenAndUser } = useAuth();
   const navigate = useNavigate();
   const [userCreationDialogOpen, setUserCreationDialogOpen] = React.useState(false);
+  const [changeMyPasswordDialogOpen, setChangeMyPasswordDialogOpen] = React.useState(false);
 
   const mainListItems = [
     { text: 'Home', icon: <HomeRoundedIcon />, href: '/me' },
     { text: 'Promotions', icon: <LocalOfferIcon />, href: '/me/promotions' },
+    { text: 'Users', icon: <GroupIcon />, href: '/employees' },
   ];
 
   const secondaryListItems = [
     {
-      text: 'Create Account',
+      text: 'Create New User',
       icon: <AddIcon />,
       onClick: () => setUserCreationDialogOpen(true),
       allowedRoles: ['cashier', 'manager', 'superuser'],
     },
     {
-      text: 'Edit My Account',
+      text: 'Edit My Info',
       icon: <Person2Icon />,
       onClick: () => navigate('/me/account'),
+      allowedRoles: null,
+    },
+    {
+      text: 'Change My Password',
+      icon: <PasswordIcon />,
+      onClick: () => setChangeMyPasswordDialogOpen(true),
       allowedRoles: null,
     },
     {
@@ -81,6 +92,7 @@ export default function MenuContent() {
         </List>
       </Stack>
       <CreateUserDialog open={userCreationDialogOpen} handleClose={setUserCreationDialogOpen} />
+      <ChangeMyPasswordDialog open={changeMyPasswordDialogOpen} handleClose={setChangeMyPasswordDialogOpen} />
     </>
   );
 }
