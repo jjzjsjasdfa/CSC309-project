@@ -17,17 +17,24 @@ import { useAuth } from '../../contexts/AuthContext';
 import * as React from "react";
 import CreateUserDialog from "../../components/CreateUserDialog";
 import ChangeMyPasswordDialog from "../../components/ChangeMyPasswordDialog";
+import EditMyInfoDialog from "../EditMyInfoDialog";
 
 export default function MenuContent() {
   const { currentUser, removeTokenAndUser } = useAuth();
   const navigate = useNavigate();
   const [userCreationDialogOpen, setUserCreationDialogOpen] = React.useState(false);
   const [changeMyPasswordDialogOpen, setChangeMyPasswordDialogOpen] = React.useState(false);
+  const [editMyInfoDialogOpen, setEditMyInfoDialogOpen] = React.useState(false);
 
   const mainListItems = [
     { text: 'Home',
       icon: <HomeRoundedIcon />,
       href: '/me',
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
+    },
+    { text: 'Template',
+      icon: <LocalOfferIcon />,
+      href: '/employees',
       allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
     { text: 'Users',
@@ -52,7 +59,7 @@ export default function MenuContent() {
     {
       text: 'Edit My Info',
       icon: <Person2Icon />,
-      onClick: () => navigate('/me/account'),
+      onClick: () => setEditMyInfoDialogOpen(true),
       allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
     {
@@ -109,6 +116,7 @@ export default function MenuContent() {
       </Stack>
       <CreateUserDialog open={userCreationDialogOpen} handleClose={setUserCreationDialogOpen} />
       <ChangeMyPasswordDialog open={changeMyPasswordDialogOpen} handleClose={setChangeMyPasswordDialogOpen} />
+      <EditMyInfoDialog open={editMyInfoDialogOpen} handleClose={setEditMyInfoDialogOpen} />
     </>
   );
 }
