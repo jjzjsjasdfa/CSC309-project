@@ -8,9 +8,6 @@ import Tooltip from '@mui/material/Tooltip';
 import {
   DataGrid,
   GridActionsCellItem,
-  GridFilterModel,
-  GridPaginationModel,
-  GridSortModel,
   gridClasses,
 } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
@@ -22,8 +19,8 @@ import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import useNotifications from '../hooks/useNotifications/useNotifications';
 import PageContainer from './PageContainer';
 import {
-    getManyPromotions,
-    deletePromotion,
+    getMany,
+    deleteOne,
 } from '../data/promotions';
 
 const INITIAL_PAGE_SIZE = 10;
@@ -109,22 +106,17 @@ export default function PromotionList() {
     setError(null);
 
     try {
-      const listData = await getManyPromotions({
-        paginationModel,
-        filterModel,
-        sortModel,
-      });
-
-      setRowsState({
+        const listData = await getMany();
+        setRowsState({
         rows: listData.items,
         rowCount: listData.itemCount,
-      });
+        });
     } catch (err) {
-      setError(err);
+        setError(err);
     }
 
     setIsLoading(false);
-  }, [paginationModel,filterModel, sortModel]);
+    }, []);
 
   React.useEffect(() => {
     loadData();
@@ -159,7 +151,7 @@ export default function PromotionList() {
 
     setIsLoading(true);
     try {
-      await deletePromotion(promo.id);
+      await deleteOne(promo.id);
       notifications.show('Promotion deleted successfully.', {
         severity: 'success'
       });
@@ -191,23 +183,30 @@ export default function PromotionList() {
       field: 'type',
       headerName: 'Type',
       width: 150,
-      valueGetter: ({ value }) => value,
     },
 
     {
-      field: 'minSpending',
-      headerName: 'Min Spending',
-      width: 150,
-      valueFormatter: ({ value }) =>
-        value != null ? `$${value.toFixed(2)}` : '-',
+    field: 'minSpending',
+    headerName: 'Min Spending',
+    width: 150,
+    valueFormatter: (value) => {
+        if (value == null) return '-';
+        const num = Number(value);
+        if (Number.isNaN(num)) return '-';
+        return `$${num.toFixed(2)}`;
+    },
     },
 
     {
       field: 'rate',
       headerName: 'Rate',
       width: 100,
-      valueFormatter: ({ value }) =>
-        value != null ? `${(value * 100).toFixed(0)}%` : '-',
+      valueFormatter: (value) => {
+        if (value == null) return '-';
+        const num = Number(value);
+        if (Number.isNaN(num)) return '-';
+        return `${(num * 100).toFixed(0)}%`;
+      },
     },
 
     {
@@ -220,14 +219,24 @@ export default function PromotionList() {
       field: 'startTime',
       headerName: 'Start Time',
       width: 160,
-      valueFormatter: ({ value }) => new Date(value).toLocaleDateString(),
+      valueFormatter: (value) => {
+        if (!value) return '-';
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return '-';
+        return d.toLocaleString();
+      },
     },
 
     {
       field: 'endTime',
       headerName: 'End Time',
       width: 160,
-      valueFormatter: ({ value }) => new Date(value).toLocaleDateString(),
+      valueFormatter: (value) => {
+        if (!value) return '-';
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return '-';
+        return d.toLocaleString();
+      },
     },
 
     {
@@ -279,9 +288,8 @@ export default function PromotionList() {
             rowCount={rowsState.rowCount}
             columns={columns}
             pagination
-            paginationMode="server"
-            sortingMode="server"
-            filterMode="server"
+            sortingMode="client"
+            filterMode="client"
             paginationModel={paginationModel}
             onPaginationModelChange={handlePaginationModelChange}
             sortModel={sortModel}

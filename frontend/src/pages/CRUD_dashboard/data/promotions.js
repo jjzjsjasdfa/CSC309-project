@@ -1,14 +1,8 @@
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 function getAuthToken() {
-  try {
-    const saved = localStorage.getItem("auth");
-    if (!saved) return null;
-    const parsed = JSON.parse(saved);
-    return parsed.token || null;
-  } catch {
-    return null;
-  }
+  const token = localStorage.getItem("token");
+  return token || null;
 }
 
 function getAuthHeaders() {
@@ -32,25 +26,8 @@ function buildSortParams(sortModel) {
 /**
  * GET all promotion
  */
-export async function getMany({
-  paginationModel,
-  filterModel,
-  sortModel,
-}) {
-  const page = paginationModel?.page != null ? paginationModel.page + 1 : 1;
-  const limit = paginationModel?.pageSize || 10;
-
-  const params = new URLSearchParams();
-  params.set("page", String(page));
-  params.set("limit", String(limit));
-
-  const sortParams = buildSortParams(sortModel);
-  sortParams.forEach(s => params.append("sort", s));
-
-  const filterParams = buildFilterParams(filterModel);
-  filterParams.forEach(f => params.append("filter", f));
-
-  const res = await fetch(`${VITE_BACKEND_URL}/promotions?${params.toString()}`, {
+export async function getMany() {
+  const res = await fetch(`${VITE_BACKEND_URL}/promotions`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -58,15 +35,33 @@ export async function getMany({
     },
   });
 
-  const data = await res.json();
+  const text = await res.text();
+  let data = null;
 
-  if (!res.ok) {
-    throw new Error(data.error || `Failed to fetch promotions (HTTP ${res.status})`);
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Failed to parse /promotions JSON:", e, text);
+    }
   }
 
+  if (!res.ok) {
+    const message =
+      (data && data.error) ||
+      `Failed to fetch promotions (HTTP ${res.status})`;
+    throw new Error(message);
+  }
+
+  const results = data && Array.isArray(data.results) ? data.results : [];
+  const count =
+    data && typeof data.count === "number"
+      ? data.count
+      : results.length;
+
   return {
-    items: data.results || [],
-    itemCount: data.count ?? (data.results ? data.results.length : 0),
+    items: results,
+    itemCount: count,
   };
 }
 
@@ -117,13 +112,14 @@ export async function createOne(promotionData) {
  * PATCH promotion
  */
 export async function updateOne(promotionId, promotionData) {
+  const { id, ...payload } = promotionData || {};
   const res = await fetch(`${VITE_BACKEND_URL}/promotions/${promotionId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
       ...getAuthHeaders(),
     },
-    body: JSON.stringify(promotionData),
+    body: JSON.stringify(payload),
   });
 
   const data = await res.json();
