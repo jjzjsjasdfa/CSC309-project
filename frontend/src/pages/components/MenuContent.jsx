@@ -26,7 +26,7 @@ export default function MenuContent() {
 
   const mainListItems = [
     { text: 'Home', icon: <HomeRoundedIcon />, href: '/me' },
-    { text: 'Promotions', icon: <LocalOfferIcon />, href: '/me/promotions' },
+    { text: 'Promotions', icon: <LocalOfferIcon />, href: '/promotions' },
     { text: 'Users', icon: <GroupIcon />, href: '/employees' },
   ];
 

@@ -16,6 +16,12 @@ import EmployeeList from './pages/CRUD_dashboard/components/EmployeeList';
 import EmployeeShow from './pages/CRUD_dashboard/components/EmployeeShow';
 import EmployeeCreate from './pages/CRUD_dashboard/components/EmployeeCreate';
 import EmployeeEdit from './pages/CRUD_dashboard/components/EmployeeEdit';
+import PromotionList from './pages/CRUD_dashboard/components/PromotionList';
+import PromotionShow from './pages/CRUD_dashboard/components/PromotionShow';
+import PromotionCreate from './pages/CRUD_dashboard/components/PromotionCreate';
+import PromotionEdit from './pages/CRUD_dashboard/components/PromotionEdit';
+
+
 
 export default function App() {
   return (
@@ -24,17 +30,25 @@ export default function App() {
         <CssBaseline />
         <BrowserRouter>
           <Routes>
+            {/* user */}
             <Route path="/" element={<Layout />}>
               <Route index element={<SignIn />} />
               <Route path="me" element={<Dashboard />} />
               <Route path="me/account" element={<EditMySelfPage />} />
               <Route path="me/promotions" element={<PromotionsDashboard />} />
-              {/*
-              <Route path="manager/promotions" element={<ManagerPromotionsPage />} />
-              <Route path="manager/promotions/new" element={<PromotionFormPage />} />
-              <Route path="manager/promotions/:id" element={<PromotionFormPage />} />*/}
               <Route path="*" element={<NotFound />} />
             </Route>
+
+            {/* promotion */}
+            <Route path="promotions" element={<CrudDashboard />}>
+              <Route index element={<PromotionList />} />
+              <Route path="new" element={<PromotionCreate />} />
+              <Route path=":promotionId" element={<PromotionShow />} />
+              <Route path=":promotionId/edit" element={<PromotionEdit />} />
+              <Route path="*" element={<PromotionList />} />
+            </Route>
+
+            {/* template */}
             <Route path="employees" element={<CrudDashboard />}>
               <Route index element={<EmployeeList />} />
               <Route path="new" element={<EmployeeCreate />} />
