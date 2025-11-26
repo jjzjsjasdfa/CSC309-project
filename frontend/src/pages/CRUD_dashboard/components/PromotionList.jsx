@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -29,6 +30,8 @@ export default function PromotionList() {
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  const isManager = ['manager', 'superuser'].includes(currentUser?.role);
 
   const dialogs = useDialogs();
   const notifications = useNotifications();
@@ -172,94 +175,84 @@ export default function PromotionList() {
     [],
   );
 
-  const columns = React.useMemo(() => [
-    { field: 'id', headerName: 'ID', width: 80 },
+    const columns = React.useMemo(() => {
+        const baseColumns = [
+        { field: 'id', headerName: 'ID', width: 80 },
+        { field: 'name', headerName: 'Name', flex: 1, minWidth: 150 },
+        { field: 'description', headerName: 'Description', flex: 2, minWidth: 200 },
+        { field: 'type', headerName: 'Type', width: 150 },
+        {
+            field: 'minSpending',
+            headerName: 'Min Spending',
+            width: 150,
+            valueFormatter: (value) => {
+            if (value == null) return '-';
+            const num = Number(value);
+            if (Number.isNaN(num)) return '-';
+            return `$${num.toFixed(2)}`;
+            },
+        },
+        {
+            field: 'rate',
+            headerName: 'Rate',
+            width: 100,
+            valueFormatter: (value) => {
+            if (value == null) return '-';
+            const num = Number(value);
+            if (Number.isNaN(num)) return '-';
+            return `${(num * 100).toFixed(0)}%`;
+            },
+        },
+        { field: 'points', headerName: 'Points', width: 100 },
+        {
+            field: 'startTime',
+            headerName: 'Start Time',
+            width: 160,
+            valueFormatter: (value) => {
+            if (!value) return '-';
+            const d = new Date(value);
+            if (Number.isNaN(d.getTime())) return '-';
+            return d.toLocaleString();
+            },
+        },
+        {
+            field: 'endTime',
+            headerName: 'End Time',
+            width: 160,
+            valueFormatter: (value) => {
+            if (!value) return '-';
+            const d = new Date(value);
+            if (Number.isNaN(d.getTime())) return '-';
+            return d.toLocaleString();
+            },
+        },
+        ];
 
-    { field: 'name', headerName: 'Name', flex: 1, minWidth: 150 },
+        if (isManager) {
+        baseColumns.push({
+            field: 'actions',
+            type: 'actions',
+            headerName: 'Actions',
+            width: 120,
+            getActions: ({ row }) => [
+            <GridActionsCellItem
+                key="edit"
+                icon={<EditIcon />}
+                label="Edit"
+                onClick={handleRowEdit(row)}
+            />,
+            <GridActionsCellItem
+                key="delete"
+                icon={<DeleteIcon />}
+                label="Delete"
+                onClick={handleRowDelete(row)}
+            />,
+            ],
+        });
+        }
 
-    { field: 'description', headerName: 'Description', flex: 2, minWidth: 200 },
-
-    {
-      field: 'type',
-      headerName: 'Type',
-      width: 150,
-    },
-
-    {
-    field: 'minSpending',
-    headerName: 'Min Spending',
-    width: 150,
-    valueFormatter: (value) => {
-        if (value == null) return '-';
-        const num = Number(value);
-        if (Number.isNaN(num)) return '-';
-        return `$${num.toFixed(2)}`;
-    },
-    },
-
-    {
-      field: 'rate',
-      headerName: 'Rate',
-      width: 100,
-      valueFormatter: (value) => {
-        if (value == null) return '-';
-        const num = Number(value);
-        if (Number.isNaN(num)) return '-';
-        return `${(num * 100).toFixed(0)}%`;
-      },
-    },
-
-    {
-      field: 'points',
-      headerName: 'Points',
-      width: 100,
-    },
-
-    {
-      field: 'startTime',
-      headerName: 'Start Time',
-      width: 160,
-      valueFormatter: (value) => {
-        if (!value) return '-';
-        const d = new Date(value);
-        if (Number.isNaN(d.getTime())) return '-';
-        return d.toLocaleString();
-      },
-    },
-
-    {
-      field: 'endTime',
-      headerName: 'End Time',
-      width: 160,
-      valueFormatter: (value) => {
-        if (!value) return '-';
-        const d = new Date(value);
-        if (Number.isNaN(d.getTime())) return '-';
-        return d.toLocaleString();
-      },
-    },
-
-    {
-      field: 'actions',
-      type: 'actions',
-      headerName: 'Actions',
-      width: 120,
-      getActions: ({ row }) => [
-        <GridActionsCellItem
-          key="edit"
-          icon={<EditIcon />}
-          label="Edit"
-          onClick={handleRowEdit(row)}
-        />,
-        <GridActionsCellItem
-          key="delete"
-          icon={<DeleteIcon />}
-          label="Delete"
-          onClick={handleRowDelete(row)}
-        />,
-      ],
-    },
-  ], []);
+        return baseColumns;
+    }, [isManager, handleRowEdit, handleRowDelete]);
 
   return (
     <PageContainer
@@ -272,10 +265,11 @@ export default function PromotionList() {
               <RefreshIcon />
             </IconButton>
           </Tooltip>
-
+        {isManager && (
           <Button variant="contained" onClick={handleCreateClick} startIcon={<AddIcon />}>
             Create
           </Button>
+        )}
         </Stack>
       }
     >
@@ -299,6 +293,7 @@ export default function PromotionList() {
             onRowClick={handleRowClick}
             loading={isLoading}
             pageSizeOptions={[5, 10, 25]}
+            showToolbar
             disableRowSelectionOnClick
             sx={{
               [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useAuth } from '../../../contexts/AuthContext';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -32,6 +33,8 @@ export default function PromotionShow() {
   const [promotion, setPromotion] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
+  const { currentUser } = useAuth();
+  const isManager = ['manager', 'superuser'].includes(currentUser?.role);
 
   const loadData = React.useCallback(async () => {
     setError(null);
@@ -227,24 +230,26 @@ export default function PromotionShow() {
           >
             Back
           </Button>
-          <Stack direction="row" spacing={2}>
-            <Button
-              variant="contained"
-              startIcon={<EditIcon />}
-              onClick={handlePromotionEdit}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              startIcon={<DeleteIcon />}
-              onClick={handlePromotionDelete}
-            >
-              Delete
-            </Button>
-          </Stack>
-        </Stack>
+          {isManager && (
+            <Stack direction="row" spacing={2}>
+                <Button
+                variant="contained"
+                startIcon={<EditIcon />}
+                onClick={handlePromotionEdit}
+                >
+                Edit
+                </Button>
+                <Button
+                variant="contained"
+                color="error"
+                startIcon={<DeleteIcon />}
+                onClick={handlePromotionDelete}
+                >
+                Delete
+                </Button>
+            </Stack>
+          )}
+            </Stack>
       </Box>
     );
   }, [
@@ -254,6 +259,7 @@ export default function PromotionShow() {
     handleBack,
     handlePromotionEdit,
     handlePromotionDelete,
+    isManager
   ]);
 
   const pageTitle = `Promotion ${promotionId}`;
