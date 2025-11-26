@@ -394,6 +394,9 @@ export const inputsCustomizations: Components<Theme> = {
           outline: `3px solid ${alpha(brand[500], 0.5)}`,
           borderColor: brand[400],
         },
+        [`&.${outlinedInputClasses.multiline}`]: {
+          height: 'auto', 
+        },
         ...theme.applyStyles('dark', {
           '&:hover': {
             borderColor: gray[500],

@@ -55,7 +55,7 @@ export default function SideMenu({ avatar, name, email }) {
         <Avatar
           sizes="small"
           alt="avatar"
-          src={avatar}
+          src={avatar || undefined}
           sx={{ width: 36, height: 36 }}
         />
         <Box sx={{ mr: 'auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>

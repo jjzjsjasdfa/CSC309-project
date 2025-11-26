@@ -8,12 +8,20 @@ import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./contexts/AuthContext";
 import Dashboard from "./pages/Dashboard";
-import UserPromotionPage from "./pages/UserPromotionPage";
-import CrudDashboard from "./pages/CrudDashboard"
-import PromotionsDashboard from "./pages/PromotionsDashboard";
+import EditMySelfPage from "./pages/EditMySelfPage";
+import CrudDashboard from "./pages/CRUD_dashboard/CrudDashboard";
+import EmployeeList from './pages/CRUD_dashboard/components/EmployeeList';
+import EmployeeShow from './pages/CRUD_dashboard/components/EmployeeShow';
+import EmployeeCreate from './pages/CRUD_dashboard/components/EmployeeCreate';
+import EmployeeEdit from './pages/CRUD_dashboard/components/EmployeeEdit';
+import PromotionList from './pages/CRUD_dashboard/components/PromotionList';
+import PromotionShow from './pages/CRUD_dashboard/components/PromotionShow';
+import PromotionCreate from './pages/CRUD_dashboard/components/PromotionCreate';
+import PromotionEdit from './pages/CRUD_dashboard/components/PromotionEdit';
 import EventsDashboard from "./pages/EventsDashboard"
 import EventDetailPage from './pages/EventDetailPage';
 import EventDetailDashboard from './pages/EventDetailDashboard.jsx';
+
 
 export default function App() {
   return (
@@ -22,17 +30,32 @@ export default function App() {
         <CssBaseline />
         <BrowserRouter>
           <Routes>
+            {/* user */}
             <Route path="/" element={<Layout />}>
-              <Route index element={<SignIn disableCustomTheme={false} />} />
+              <Route index element={<SignIn />} />
               <Route path="me" element={<Dashboard />} />
-              <Route path="me/promotions" element={<PromotionsDashboard />} />
-              {/*
-              <Route path="manager/promotions" element={<ManagerPromotionsPage />} />
-              <Route path="manager/promotions/new" element={<PromotionFormPage />} />
-              <Route path="manager/promotions/:id" element={<PromotionFormPage />} />*/}
+              <Route path="me/account" element={<EditMySelfPage />} />
               <Route path="me/events" element={<EventsDashboard />} />
               <Route path="me/events/:eventId" element={<EventDetailDashboard />} />
               <Route path="*" element={<NotFound />} />
+            </Route>
+
+            {/* promotion */}
+            <Route path="promotions" element={<CrudDashboard />}>
+              <Route index element={<PromotionList />} />
+              <Route path="new" element={<PromotionCreate />} />
+              <Route path=":promotionId" element={<PromotionShow />} />
+              <Route path=":promotionId/edit" element={<PromotionEdit />} />
+              <Route path="*" element={<PromotionList />} />
+            </Route>
+
+            {/* template */}
+            <Route path="employees" element={<CrudDashboard />}>
+              <Route index element={<EmployeeList />} />
+              <Route path="new" element={<EmployeeCreate />} />
+              <Route path=":employeeId" element={<EmployeeShow />} />
+              <Route path=":employeeId/edit" element={<EmployeeEdit />} />
+              <Route path="*" element={<EmployeeList />} />
             </Route>
           </Routes>
         </BrowserRouter>

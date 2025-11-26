@@ -162,7 +162,7 @@ export default function SignIn(props) {
                 color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
-            <ForgotPassword open={open} setOpen={setOpen} />
+            <ForgotPassword open={open} handleClose={setOpen} />
             <Button
               type="submit"
               fullWidth
