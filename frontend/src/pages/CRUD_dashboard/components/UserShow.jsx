@@ -53,6 +53,20 @@ export default function UserShow() {
     navigate('/users');
   }, [navigate]);
 
+  const dateTimeFormatter = (value) => {
+    if (!value) return '-';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return '-';
+    return d.toLocaleString();
+  };
+
+  const dateFormatter = (value) => {
+    if (!value) return '-';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return '-';
+    return d.toLocaleDateString();
+  };
+
   const renderShow = React.useMemo(() => {
     if (isLoading) {
       return (
@@ -130,7 +144,7 @@ export default function UserShow() {
             <Paper sx={{ px: 2, py: 1 }}>
               <Typography variant="overline">Birthday</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                {user.birthday ?? "-" }
+                { user.birthday ? dateFormatter(user.birthday) : "-" }
               </Typography>
             </Paper>
           </Grid>
@@ -160,7 +174,7 @@ export default function UserShow() {
             <Paper sx={{ px: 2, py: 1 }}>
               <Typography variant="overline">Created At</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                {user.createdAt ?? "—"}
+                { user.createdAt ? dateTimeFormatter(user.createdAt) : "-" }
               </Typography>
             </Paper>
           </Grid>
@@ -170,7 +184,7 @@ export default function UserShow() {
             <Paper sx={{ px: 2, py: 1 }}>
               <Typography variant="overline">Last Login</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                {user.lastLogin ?? "—"}2
+                { user.lastLogin ? dateTimeFormatter(user.lastLogin) : "-" }
               </Typography>
             </Paper>
           </Grid>
