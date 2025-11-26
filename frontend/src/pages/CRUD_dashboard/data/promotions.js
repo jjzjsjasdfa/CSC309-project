@@ -10,19 +10,6 @@ function getAuthHeaders() {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
-function buildFilterParams(filterModel) {
-  if (!filterModel?.items?.length) return [];
-
-  return filterModel.items
-    .filter(item => item.value != null && item.value !== "")
-    .map(item => `${item.field}~${item.operator}~${item.value}`);
-}
-
-function buildSortParams(sortModel) {
-  if (!sortModel?.length) return [];
-  return sortModel.map(s => `${s.field}~${s.sort}`);
-}
-
 /**
  * GET all promotion
  */

@@ -10,27 +10,19 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
-
-import { useDialogs } from '../hooks/useDialogs/useDialogs';
-import useNotifications from '../hooks/useNotifications/useNotifications';
 import {
-  deleteOne as deletePromotion,
-  getOne as getPromotion,
-} from '../data/promotions';
+  getOne as getUser,
+} from '../data/users';
 import PageContainer from './PageContainer';
 
-export default function PromotionShow() {
-  const { promotionId } = useParams();
+export default function UserShow() {
+  const { userId } = useParams();
   const navigate = useNavigate();
 
-  const dialogs = useDialogs();
-  const notifications = useNotifications();
-
-  const [promotion, setPromotion] = React.useState(null);
+  const [user, setUser] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const { currentUser } = useAuth();
@@ -41,61 +33,24 @@ export default function PromotionShow() {
     setIsLoading(true);
 
     try {
-      const showData = await getPromotion(Number(promotionId));
-      setPromotion(showData);
+      const showData = await getUser(Number(userId));
+      setUser(showData);
     } catch (showDataError) {
       setError(showDataError);
     }
     setIsLoading(false);
-  }, [promotionId]);
+  }, [userId]);
 
   React.useEffect(() => {
     loadData();
   }, [loadData]);
 
-  const handlePromotionEdit = React.useCallback(() => {
-    navigate(`/promotions/${promotionId}/edit`);
-  }, [navigate, promotionId]);
-
-  const handlePromotionDelete = React.useCallback(async () => {
-    if (!promotion) return;
-
-    const confirmed = await dialogs.confirm(
-      `Do you wish to delete "${promotion.name}"?`,
-      {
-        title: 'Delete promotion?',
-        severity: 'error',
-        okText: 'Delete',
-        cancelText: 'Cancel',
-      },
-    );
-
-    if (confirmed) {
-      setIsLoading(true);
-      try {
-        await deletePromotion(Number(promotionId));
-
-        navigate('/promotions');
-
-        notifications.show('Promotion deleted successfully.', {
-          severity: 'success',
-          autoHideDuration: 3000,
-        });
-      } catch (deleteError) {
-        notifications.show(
-          `Failed to delete promotion. Reason: ${deleteError.message}`,
-          {
-            severity: 'error',
-            autoHideDuration: 3000,
-          },
-        );
-      }
-      setIsLoading(false);
-    }
-  }, [promotion, dialogs, promotionId, navigate, notifications]);
+  const handleUserEdit = React.useCallback(() => {
+    navigate(`/users/${userId}/edit`);
+  }, [navigate, userId]);
 
   const handleBack = React.useCallback(() => {
-    navigate('/promotions');
+    navigate('/users');
   }, [navigate]);
 
   const renderShow = React.useMemo(() => {
@@ -125,86 +80,67 @@ export default function PromotionShow() {
       );
     }
 
-    if (!promotion) return null;
-
-    const start = promotion.startTime
-      ? dayjs(promotion.startTime).format('MMMM D, YYYY')
-      : '-';
-    const end = promotion.endTime
-      ? dayjs(promotion.endTime).format('MMMM D, YYYY')
-      : '-';
+    if (!user) return null;
 
     return (
       <Box sx={{ flexGrow: 1, width: '100%' }}>
         <Grid container spacing={2} sx={{ width: '100%' }}>
+          {/* ID */}
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Paper sx={{ px: 2, py: 1 }}>
+              <Typography variant="overline">ID</Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                {user.id}
+              </Typography>
+            </Paper>
+          </Grid>
+
+          {/* UTORID */}
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Paper sx={{ px: 2, py: 1 }}>
+              <Typography variant="overline">Utorid</Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                {user.utorid}
+              </Typography>
+            </Paper>
+          </Grid>
+
           {/* Name */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <Paper sx={{ px: 2, py: 1 }}>
               <Typography variant="overline">Name</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                {promotion.name}
+                {user.name}
               </Typography>
             </Paper>
           </Grid>
 
-          {/* Type */}
+          {/* Email */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <Paper sx={{ px: 2, py: 1 }}>
-              <Typography variant="overline">Type</Typography>
+              <Typography variant="overline">Email</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                {promotion.type === 'automatic' ? 'Automatic' : promotion.type}
+                {user.email}
               </Typography>
             </Paper>
           </Grid>
 
-          {/* Description */}
+          {/* Birthday */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <Paper sx={{ px: 2, py: 1 }}>
-              <Typography variant="overline">Description</Typography>
+              <Typography variant="overline">Birthday</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                {promotion.description || '-'}
+                {user.birthday ?? "-" }
               </Typography>
             </Paper>
           </Grid>
 
-          {/* Start / End */}
+          {/* Role */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <Paper sx={{ px: 2, py: 1 }}>
-              <Typography variant="overline">Start date</Typography>
+              <Typography variant="overline">Role</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                {start}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Paper sx={{ px: 2, py: 1 }}>
-              <Typography variant="overline">End date</Typography>
-              <Typography variant="body1" sx={{ mb: 1 }}>
-                {end}
-              </Typography>
-            </Paper>
-          </Grid>
-
-          {/* Min spending */}
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Paper sx={{ px: 2, py: 1 }}>
-              <Typography variant="overline">Min spending</Typography>
-              <Typography variant="body1" sx={{ mb: 1 }}>
-                {promotion.minSpending != null
-                  ? `$${promotion.minSpending.toFixed(2)}`
-                  : '-'}
-              </Typography>
-            </Paper>
-          </Grid>
-
-          {/* Rate */}
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Paper sx={{ px: 2, py: 1 }}>
-              <Typography variant="overline">Rate</Typography>
-              <Typography variant="body1" sx={{ mb: 1 }}>
-                {promotion.rate != null
-                  ? `${(promotion.rate * 100).toFixed(0)}%`
-                  : '-'}
+                {user.role}
               </Typography>
             </Paper>
           </Grid>
@@ -214,8 +150,76 @@ export default function PromotionShow() {
             <Paper sx={{ px: 2, py: 1 }}>
               <Typography variant="overline">Points</Typography>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                {promotion.points != null ? promotion.points : '-'}
+                {user.points}
               </Typography>
+            </Paper>
+          </Grid>
+
+          {/* Created At */}
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Paper sx={{ px: 2, py: 1 }}>
+              <Typography variant="overline">Created At</Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                {user.createdAt ?? "—"}
+              </Typography>
+            </Paper>
+          </Grid>
+
+          {/* Last Login */}
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Paper sx={{ px: 2, py: 1 }}>
+              <Typography variant="overline">Last Login</Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                {user.lastLogin ?? "—"}2
+              </Typography>
+            </Paper>
+          </Grid>
+
+          {/* Verified */}
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Paper sx={{ px: 2, py: 1 }}>
+              <Typography variant="overline">Verified</Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                {user.verified ? "Yes" : "No"}
+              </Typography>
+            </Paper>
+          </Grid>
+
+          {/* Avatar URL */}
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Paper sx={{ px: 2, py: 1 }}>
+              <Typography variant="overline">Avatar URL</Typography>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                {user.avatarUrl ?? "—"}
+              </Typography>
+            </Paper>
+          </Grid>
+
+          {/* Promotions */}
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Paper sx={{ px: 2, py: 1 }}>
+              <Typography variant="overline">Promotions</Typography>
+
+              {user.promotions && user.promotions.length > 0 ? (
+                user.promotions.map((promo) => (
+                  <Box key={promo.id} sx={{ mb: 1 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                      {promo.name}
+                    </Typography>
+                    <Typography variant="body2">
+                      Min Spending: {promo.minSpending ?? "—"}
+                    </Typography>
+                    <Typography variant="body2">
+                      Rate: {promo.rate ?? "—"}
+                    </Typography>
+                    <Typography variant="body2">
+                      Points: {promo.points ?? "—"}
+                    </Typography>
+                  </Box>
+                ))
+              ) : (
+                <Typography variant="body1">—</Typography>
+              )}
             </Paper>
           </Grid>
         </Grid>
@@ -235,17 +239,9 @@ export default function PromotionShow() {
                 <Button
                 variant="contained"
                 startIcon={<EditIcon />}
-                onClick={handlePromotionEdit}
+                onClick={handleUserEdit}
                 >
                 Edit
-                </Button>
-                <Button
-                variant="contained"
-                color="error"
-                startIcon={<DeleteIcon />}
-                onClick={handlePromotionDelete}
-                >
-                Delete
                 </Button>
             </Stack>
           )}
@@ -255,20 +251,19 @@ export default function PromotionShow() {
   }, [
     isLoading,
     error,
-    promotion,
+    user,
     handleBack,
-    handlePromotionEdit,
-    handlePromotionDelete,
+    handleUserEdit,
     isManager
   ]);
 
-  const pageTitle = `Promotion ${promotionId}`;
+  const pageTitle = `User ${userId}`;
 
   return (
     <PageContainer
       title={pageTitle}
       breadcrumbs={[
-        { title: 'Promotions', path: '/promotions' },
+        { title: 'Users', path: '/users' },
         { title: pageTitle },
       ]}
     >
