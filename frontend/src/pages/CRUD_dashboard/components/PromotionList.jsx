@@ -175,84 +175,86 @@ export default function PromotionList() {
     [],
   );
 
-    const columns = React.useMemo(() => {
-        const baseColumns = [
-        { field: 'id', headerName: 'ID', width: 80 },
-        { field: 'name', headerName: 'Name', flex: 1, minWidth: 150 },
-        { field: 'description', headerName: 'Description', flex: 2, minWidth: 200 },
-        { field: 'type', headerName: 'Type', width: 150 },
-        {
-            field: 'minSpending',
-            headerName: 'Min Spending',
-            width: 150,
-            valueFormatter: (value) => {
-            if (value == null) return '-';
-            const num = Number(value);
-            if (Number.isNaN(num)) return '-';
-            return `$${num.toFixed(2)}`;
-            },
+  const columns = React.useMemo(() => {
+    const baseColumns = [
+      { field: 'id', headerName: 'ID', width: 80 },
+      { field: 'name', headerName: 'Name', flex: 1, minWidth: 150 },
+      { field: 'description', headerName: 'Description', flex: 2, minWidth: 200 },
+      { field: 'type', headerName: 'Type', width: 150 },
+      {
+        field: 'minSpending',
+        headerName: 'Min Spending',
+        width: 150,
+        valueFormatter: (value) => {
+        if (value == null) return '-';
+        const num = Number(value);
+        if (Number.isNaN(num)) return '-';
+        return `$${num.toFixed(2)}`;
         },
-        {
-            field: 'rate',
-            headerName: 'Rate',
-            width: 100,
-            valueFormatter: (value) => {
-            if (value == null) return '-';
-            const num = Number(value);
-            if (Number.isNaN(num)) return '-';
-            return `${(num * 100).toFixed(0)}%`;
-            },
-        },
-        { field: 'points', headerName: 'Points', width: 100 },
-        {
-            field: 'startTime',
-            headerName: 'Start Time',
-            width: 160,
-            valueFormatter: (value) => {
-            if (!value) return '-';
-            const d = new Date(value);
-            if (Number.isNaN(d.getTime())) return '-';
-            return d.toLocaleString();
-            },
-        },
-        {
-            field: 'endTime',
-            headerName: 'End Time',
-            width: 160,
-            valueFormatter: (value) => {
-            if (!value) return '-';
-            const d = new Date(value);
-            if (Number.isNaN(d.getTime())) return '-';
-            return d.toLocaleString();
-            },
-        },
-        ];
+      },
 
-        if (isManager) {
-        baseColumns.push({
-            field: 'actions',
-            type: 'actions',
-            headerName: 'Actions',
-            width: 120,
-            getActions: ({ row }) => [
-            <GridActionsCellItem
-                key="edit"
-                icon={<EditIcon />}
-                label="Edit"
-                onClick={handleRowEdit(row)}
-            />,
-            <GridActionsCellItem
-                key="delete"
-                icon={<DeleteIcon />}
-                label="Delete"
-                onClick={handleRowDelete(row)}
-            />,
-            ],
-        });
-        }
+      {
+        field: 'rate',
+        headerName: 'Rate',
+        width: 100,
+        valueFormatter: (value) => {
+        if (value == null) return '-';
+        const num = Number(value);
+        if (Number.isNaN(num)) return '-';
+        return `${(num * 100).toFixed(0)}%`;
+        },
+      },
 
-        return baseColumns;
-    }, [isManager, handleRowEdit, handleRowDelete]);
+      { field: 'points', headerName: 'Points', width: 100 },
+
+      {
+        field: 'startTime',
+        headerName: 'Start Time',
+        width: 160,
+        valueFormatter: (value) => {
+        if (!value) return '-';
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return '-';
+        return d.toLocaleString();
+        },
+      },
+    
+      {
+        field: 'endTime',
+        headerName: 'End Time',
+        width: 160,
+        valueFormatter: (value) => {
+        if (!value) return '-';
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return '-';
+        return d.toLocaleString();
+        },
+      },
+    ];
+
+    if (isManager) {
+    baseColumns.push({
+      field: 'actions',
+      type: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      getActions: ({ row }) => [
+        <GridActionsCellItem
+          key="edit"
+          icon={<EditIcon />}
+          label="Edit"
+          onClick={handleRowEdit(row)}
+        />,
+        <GridActionsCellItem
+          key="delete"
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={handleRowDelete(row)}
+        />,
+      ],
+    });
+  }
+  return baseColumns;}, [isManager, handleRowEdit, handleRowDelete]);
 
   return (
     <PageContainer
