@@ -13,7 +13,7 @@ import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router';
@@ -152,7 +152,7 @@ return (
           {/* Start time */}
           <Grid item xs={12} sm={6} sx={{ display: 'flex' }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
+              <DateTimePicker
                 value={
                   formValues.startTime ? dayjs(formValues.startTime) : null
                 }
@@ -172,7 +172,7 @@ return (
           {/* End time */}
           <Grid item xs={12} sm={6} sx={{ display: 'flex' }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
+              <DateTimePicker
                 value={formValues.endTime ? dayjs(formValues.endTime) : null}
                 onChange={handleDateFieldChange('endTime')}
                 label="End time"
