@@ -25,9 +25,21 @@ export default function MenuContent() {
   const [changeMyPasswordDialogOpen, setChangeMyPasswordDialogOpen] = React.useState(false);
 
   const mainListItems = [
-    { text: 'Home', icon: <HomeRoundedIcon />, href: '/me' },
-    { text: 'Promotions', icon: <LocalOfferIcon />, href: '/promotions' },
-    { text: 'Users', icon: <GroupIcon />, href: '/employees' },
+    { text: 'Home',
+      icon: <HomeRoundedIcon />,
+      href: '/me',
+      allowedRoles: null,
+    },
+    { text: 'Users',
+      icon: <GroupIcon />,
+      href: '/users',
+      allowedRoles: ['manager', 'superuser'],
+    },
+    { text: 'Promotions',
+      icon: <LocalOfferIcon />,
+      href: '/promotions',
+      allowedRoles: null,
+    },
   ];
 
   const secondaryListItems = [
@@ -66,15 +78,19 @@ export default function MenuContent() {
     <>
       <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
         <List dense>
-          {mainListItems.map((item, index) => (
-            <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton component={RouterLink} to={item.href || "#"}
-                selected={window.location.pathname === item.href}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          {mainListItems.map((item, index) => {
+            const allowed = !item.allowedRoles || (userRole && item.allowedRoles?.includes(userRole));
+            if (!allowed) return null;
+            return (
+              <ListItem key={index} disablePadding sx={{display: 'block'}}>
+                <ListItemButton component={RouterLink} to={item.href || "/"}
+                                selected={window.location.pathname === item.href}>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text}/>
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         </List>
         <List dense>
           {secondaryListItems.map((item, index) => {
