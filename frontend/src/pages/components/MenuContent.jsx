@@ -28,7 +28,7 @@ export default function MenuContent() {
     { text: 'Home',
       icon: <HomeRoundedIcon />,
       href: '/me',
-      allowedRoles: null,
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
     { text: 'Users',
       icon: <GroupIcon />,
@@ -38,7 +38,7 @@ export default function MenuContent() {
     { text: 'Promotions',
       icon: <LocalOfferIcon />,
       href: '/promotions',
-      allowedRoles: null,
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
   ];
 
@@ -53,13 +53,13 @@ export default function MenuContent() {
       text: 'Edit My Info',
       icon: <Person2Icon />,
       onClick: () => navigate('/me/account'),
-      allowedRoles: null,
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
     {
       text: 'Change My Password',
       icon: <PasswordIcon />,
       onClick: () => setChangeMyPasswordDialogOpen(true),
-      allowedRoles: null,
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
     {
       text: 'Logout',
@@ -68,7 +68,7 @@ export default function MenuContent() {
         removeTokenAndUser();
         navigate('/');
       },
-      allowedRoles: null,
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
   ];
 
@@ -79,7 +79,7 @@ export default function MenuContent() {
       <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
         <List dense>
           {mainListItems.map((item, index) => {
-            const allowed = !item.allowedRoles || (userRole && item.allowedRoles?.includes(userRole));
+            const allowed = userRole && item.allowedRoles.includes(userRole);
             if (!allowed) return null;
             return (
               <ListItem key={index} disablePadding sx={{display: 'block'}}>
@@ -94,7 +94,7 @@ export default function MenuContent() {
         </List>
         <List dense>
           {secondaryListItems.map((item, index) => {
-            const allowed = !item.allowedRoles || (userRole && item.allowedRoles?.includes(userRole));
+            const allowed = userRole && item.allowedRoles.includes(userRole);
             if (!allowed) return null;
             return (
               <ListItem key={index} disablePadding sx={{ display: 'block' }}>
