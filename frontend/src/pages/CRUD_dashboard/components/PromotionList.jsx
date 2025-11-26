@@ -23,6 +23,7 @@ import {
     getMany,
     deleteOne,
 } from '../data/promotions';
+import ColorModeIconDropdown from "../../../shared-theme/ColorModeIconDropdown";
 
 const INITIAL_PAGE_SIZE = 10;
 
@@ -275,6 +276,9 @@ export default function PromotionList() {
         </Stack>
       }
     >
+      <Box sx={{ position: 'fixed', top: '0.75rem', right: '2.25rem', zIndex: 1000 }}>
+        <ColorModeIconDropdown />
+      </Box>
       <Box sx={{ flex: 1, width: '100%' }}>
         {error ? (
           <Alert severity="error">{error.message}</Alert>

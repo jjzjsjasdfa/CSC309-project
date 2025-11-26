@@ -8,8 +8,6 @@ import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
 import {AuthProvider} from "./contexts/AuthContext";
 import Dashboard from "./pages/Dashboard";
-import UserPromotionPage from "./pages/UserPromotionPage";
-import PromotionsDashboard from "./pages/PromotionsDashboard";
 import EditMySelfPage from "./pages/EditMySelfPage";
 import CrudDashboard from "./pages/CRUD_dashboard/CrudDashboard";
 import EmployeeList from './pages/CRUD_dashboard/components/EmployeeList';
@@ -35,7 +33,6 @@ export default function App() {
               <Route index element={<SignIn />} />
               <Route path="me" element={<Dashboard />} />
               <Route path="me/account" element={<EditMySelfPage />} />
-              <Route path="me/promotions" element={<PromotionsDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Route>
 
