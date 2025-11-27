@@ -16,7 +16,7 @@ function ForgotPassword({ open, handleClose: setOpen }) {
   const [dialogContentText, setDialogContentText] = React.useState('');
 
   useEffect(() => {
-    setDialogContentText('Enter the account\'s utorid, and we\'ll give you a reset token.');
+    setDialogContentText('Enter the account\'s utorid, and we\'ll send you a reset link to your email.');
   }, []);
 
   const handleClose = () => {
@@ -30,7 +30,7 @@ function ForgotPassword({ open, handleClose: setOpen }) {
       TransitionProps={{
         onExited: () => {
           setResetError(false);
-          setDialogContentText("Enter the account's utorid, and we'll give you a reset token.");
+          setDialogContentText("Enter the account's utorid, and we'll send you a reset link to your email.");
         },
       }}
       slotProps={{
@@ -43,26 +43,29 @@ function ForgotPassword({ open, handleClose: setOpen }) {
             // get reset token
             const formData = new FormData(event.currentTarget);
             const utorid = formData.get('utorid');
-            const res = await fetch(`${VITE_BACKEND_URL}/auth/resets`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ utorid })
-            })
-            const data = await res.json()
+            try {
+              const res = await fetch(`${VITE_BACKEND_URL}/auth/resets`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ utorid })
+              })
+              const data = await res.json()
 
-            // failure
-            if (!res.ok) {
+              // failure
+              if (!res.ok) {
+                setResetError(true);
+                setDialogContentText(`${data.error}`);
+                return;
+              }
+
+              // success
+              setResetError(false);
+              setDialogContentText(data.message || "We have sent a reset link to your email address!");
+              
+            } catch (err) {
               setResetError(true);
-              setDialogContentText(`${data.error}`);
-              return;
+              setDialogContentText("Network error. Please check your connection.");
             }
-
-            // success
-            //TODO: send the token to the email address associated with the utorid
-            const resetToken = data["resetToken"];
-
-            setResetError(false);
-            setDialogContentText(`We have sent you the email!`);
           },
           sx: {
             backgroundImage: 'none',
