@@ -22,6 +22,9 @@ import PromotionList from './pages/CRUD_dashboard/components/PromotionList';
 import PromotionShow from './pages/CRUD_dashboard/components/PromotionShow';
 import PromotionCreate from './pages/CRUD_dashboard/components/PromotionCreate';
 import PromotionEdit from './pages/CRUD_dashboard/components/PromotionEdit';
+import TransactionCreate from './pages/CRUD_dashboard/components/TransactionCreate';
+import TransactionList from './pages/CRUD_dashboard/components/TransactionList';
+import TransactionShow from './pages/CRUD_dashboard/components/TransactionShow';
 import UserEventsPage from './pages/CRUD_dashboard/components/UserEventsPage';
 import EventDetailPage from './pages/CRUD_dashboard/components/EventDetailPage';
 import ResetPassword from './pages/ResetPassword';
@@ -77,6 +80,14 @@ export default function App() {
               <Route path=":employeeId" element={<EmployeeShow />} />
               <Route path=":employeeId/edit" element={<EmployeeEdit />} />
               <Route path="*" element={<EmployeeList />} />
+            </Route>
+
+            {/* transactions */}
+            <Route path="transactions" element={<CrudDashboard />}>
+              <Route index element={<TransactionList />} />
+              <Route path="new" element={<TransactionCreate />} />
+              <Route path=":transactionId" element={<TransactionShow />} />
+              <Route path="*" element={<TransactionList />} />
             </Route>
           </Routes>
         </BrowserRouter>

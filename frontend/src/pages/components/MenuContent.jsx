@@ -11,6 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Person2Icon from '@mui/icons-material/Person2';
 import PasswordIcon from '@mui/icons-material/Password';
 import GroupIcon from '@mui/icons-material/Group';
+import PaidIcon from '@mui/icons-material/Paid';
 import { Link as RouterLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -49,6 +50,11 @@ export default function MenuContent() {
       text: 'Promotions',
       icon: <LocalOfferIcon />,
       href: '/promotions',
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
+    },
+    { text: 'Transactions',
+      icon: <PaidIcon />,
+      href: '/transactions',
       allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
     {
