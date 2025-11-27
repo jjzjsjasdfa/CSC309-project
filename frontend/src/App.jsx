@@ -22,6 +22,9 @@ import PromotionList from './pages/CRUD_dashboard/components/PromotionList';
 import PromotionShow from './pages/CRUD_dashboard/components/PromotionShow';
 import PromotionCreate from './pages/CRUD_dashboard/components/PromotionCreate';
 import PromotionEdit from './pages/CRUD_dashboard/components/PromotionEdit';
+import UserEventsPage from './pages/CRUD_dashboard/components/UserEventsPage';
+import EventDetailPage from './pages/CRUD_dashboard/components/EventDetailPage';
+import ResetPassword from './pages/ResetPassword';
 
 
 
