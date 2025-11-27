@@ -3,10 +3,10 @@ import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
 import CssBaseline from '@mui/material/CssBaseline';
 import Layout from './components/Layout';
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
-import {AuthProvider} from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import EditMySelfPage from "./pages/EditMyInfoDialog";
 import CrudDashboard from "./pages/CRUD_dashboard/CrudDashboard";
@@ -22,7 +22,10 @@ import PromotionList from './pages/CRUD_dashboard/components/PromotionList';
 import PromotionShow from './pages/CRUD_dashboard/components/PromotionShow';
 import PromotionCreate from './pages/CRUD_dashboard/components/PromotionCreate';
 import PromotionEdit from './pages/CRUD_dashboard/components/PromotionEdit';
+import UserEventsPage from './pages/CRUD_dashboard/components/UserEventsPage';
+import EventDetailPage from './pages/CRUD_dashboard/components/EventDetailPage';
 import ResetPassword from './pages/ResetPassword';
+
 
 
 export default function App() {
@@ -40,6 +43,15 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
 
+            {/* user */}
+            <Route path="users" element={<CrudDashboard />}>
+              <Route index element={<UserList />} />
+              <Route path="new" element={<UserCreate />} />
+              <Route path=":userId" element={<UserShow />} />
+              <Route path=":userId/edit" element={<UserEdit />} />
+              <Route path="*" element={<UserList />} />
+            </Route>
+
             <Route path="/reset-password/:token" element={<ResetPassword />} />
 
             {/* promotion */}
@@ -51,13 +63,11 @@ export default function App() {
               <Route path="*" element={<PromotionList />} />
             </Route>
 
-            {/* user */}
-            <Route path="users" element={<CrudDashboard />}>
-              <Route index element={<UserList />} />
-              <Route path="new" element={<UserCreate />} />
-              <Route path=":userId" element={<UserShow />} />
-              <Route path=":userId/edit" element={<UserEdit />} />
-              <Route path="*" element={<UserList />} />
+            {/* Event */}
+            <Route path="events" element={<CrudDashboard />}>
+              <Route index element={<UserEventsPage />} />
+              <Route path=":eventId" element={<EventDetailPage />} />
+              <Route path="*" element={<UserEventsPage />} />
             </Route>
 
             {/* template */}

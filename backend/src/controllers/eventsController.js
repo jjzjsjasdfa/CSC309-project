@@ -41,8 +41,8 @@ const eventController = {
   async getEvents(req, res){
     try {
       const present = new Date();
-      const page  = Number.isInteger(+req.query.page)  && +req.query.page  > 0 ? +req.query.page  : 1;
-      const limit = Number.isInteger(+req.query.limit) && +req.query.limit > 0 ? +req.query.limit : 10;
+      //const page  = Number.isInteger(+req.query.page)  && +req.query.page  > 0 ? +req.query.page  : 1;
+      //const limit = Number.isInteger(+req.query.limit) && +req.query.limit > 0 ? +req.query.limit : 10;
 
       function parseBool(v) {
         if (v === undefined) return undefined;
@@ -87,8 +87,9 @@ const eventController = {
       }
 
       const count = events.length;
-      const start = (page - 1) * limit;
-      const pageItems = events.slice(start, start + limit);
+      //const start = (page - 1) * limit;
+      //const pageItems = events.slice(start, start + limit);
+      const pageItems = events;
 
       const isRegularView = (role === 'regular' || role === 'cashier');
       const results = pageItems.map(ev => {
@@ -177,9 +178,9 @@ const eventController = {
     try {
       let eid = parseInt(req.params.eventId, 10);
       let event = await eventsService.getEventById(eid);
-      if(Boolean(event.published) === true) {
+      /*if(Boolean(event.published) === true) {
         return res.status(400).json({ message: "event already published" });
-      }
+      }*/
       await eventsService.deleteEventById(eid);
       return res.status(204).send();
     }
@@ -208,10 +209,10 @@ const eventController = {
       if(Boolean(event.published) === false) {
         return res.status(404).json({ message: "event not found" });
       }
-      const { id, name, description, location, startTime, endTime, capacity, organizers,numGuests
+      const { id, name, description, location, startTime, endTime, capacity, organizers,guests,numGuests
       } = event;
       return res.status(200).json({ id, name, description, location, startTime, endTime, capacity, 
-        organizers, numGuests
+        organizers,guests, numGuests
       });
     }
     catch(error){
@@ -367,6 +368,7 @@ const eventController = {
         name: updated.name,
         location: updated.location,
       };
+      if (patch.description !== undefined) out.description = updated.description;
       if (patch.startTime !== undefined) out.startTime = updated.startTime;
       if (patch.endTime !== undefined) out.endTime = updated.endTime;
       if (patch.capacity !== undefined) out.capacity = updated.capacity ?? null;
