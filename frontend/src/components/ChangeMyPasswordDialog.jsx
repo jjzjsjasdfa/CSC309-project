@@ -6,10 +6,11 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import {useEffect} from "react";
 import { useAuth } from '../contexts/AuthContext.jsx';
 import {useNavigate} from "react-router-dom";
+import TextField from "@mui/material/TextField";
+import useNotifications from '../pages/CRUD_dashboard/hooks/useNotifications/useNotifications';
 
 const VITE_BACKEND_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
@@ -20,6 +21,7 @@ function ChangeMyPasswordDialog({ open, handleClose: setOpen }) {
   const [error, setError] = React.useState(false);
   const [dialogContentText, setDialogContentText] = React.useState('');
   const navigate = useNavigate();
+  const notifications = useNotifications();
   const { token } = useAuth();
 
   useEffect(() => {
@@ -79,12 +81,16 @@ function ChangeMyPasswordDialog({ open, handleClose: setOpen }) {
             // success
             clearData();
             setError(false);
+            notifications.show(`Password has been changed! Please login again.`, {
+              severity: 'success',
+              autoHideDuration: 3000,
+            });
             setDialogContentText(`Password has been changed! Please login again.`);
             setIsReset(true);
           },
           sx: {
             backgroundImage: 'none',
-            width: 'auto',
+            minWidth: '400px',
             maxWidth: '90%',
             height: 'auto',
             maxHeight: '90%'
@@ -92,43 +98,57 @@ function ChangeMyPasswordDialog({ open, handleClose: setOpen }) {
         },
       }}
     >
-      <DialogTitle>Change My Password</DialogTitle>
+      <DialogTitle>Change Password</DialogTitle>
       <DialogContent
         sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}
       >
         <DialogContentText sx={{color: (theme) => error ? theme.palette.error.main : theme.palette.primary}}>
           { dialogContentText }
         </DialogContentText>
-        <OutlinedInput
+        <TextField
           autoFocus
           required
           margin="dense"
           value={oldPassword}
           id="old"
           name="old"
-          label="old"
-          placeholder="old password"
-          type="text"
+          label="Old Password"
+          type="password"
           onChange={(e) => setOld(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              "&.MuiInputLabel-shrink": {
+                transform: "translate(8px, -17px) scale(0.75)",
+              }
+            }
+          }}
           fullWidth
         />
-        <OutlinedInput
+        <TextField
           required
           margin="dense"
           value={newPassword}
           id="new"
           name="new"
-          label="new"
-          placeholder="new password"
-          type="text"
+          label="New Password"
+          type="password"
           onChange={(e) => setNew(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              "&.MuiInputLabel-shrink": {
+                transform: "translate(8px, -17px) scale(0.75)",
+              }
+            }
+          }}
           fullWidth
         />
       </DialogContent>
       <DialogActions sx={{ pb: 3, px: 3 }}>
         <Button onClick={handleClose}>Close</Button>
         <Button variant="contained" type="submit">
-          Create
+          Change
         </Button>
       </DialogActions>
     </Dialog>

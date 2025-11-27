@@ -6,11 +6,12 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import {useEffect} from "react";
 import { useAuth } from '../contexts/AuthContext.jsx';
+import TextField from "@mui/material/TextField";
+import useNotifications from '../pages/CRUD_dashboard/hooks/useNotifications/useNotifications';
 
-const VITE_BACKEND_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 function CreateUserDialog({ open, handleClose: setOpen }) {
   const [utorid, setUtorid] = React.useState('');
@@ -18,6 +19,8 @@ function CreateUserDialog({ open, handleClose: setOpen }) {
   const [email, setEmail] = React.useState('');
   const [error, setError] = React.useState(false);
   const [dialogContentText, setDialogContentText] = React.useState('');
+  const notifications = useNotifications();
+
   const { token } = useAuth();
 
   useEffect(() => {
@@ -73,11 +76,15 @@ function CreateUserDialog({ open, handleClose: setOpen }) {
             // success
             clearData();
             setError(false);
+            notifications.show(`User ${name} has been created!`, {
+              severity: 'success',
+              autoHideDuration: 3000,
+            });
             setDialogContentText(`User ${name} has been created!`);
           },
           sx: {
             backgroundImage: 'none',
-            width: 'auto',
+            minWidth: '400px',
             maxWidth: '90%',
             height: 'auto',
             maxHeight: '90%'
@@ -92,7 +99,7 @@ function CreateUserDialog({ open, handleClose: setOpen }) {
         <DialogContentText sx={{color: (theme) => error ? theme.palette.error.main : theme.palette.primary}}>
           { dialogContentText }
         </DialogContentText>
-        <OutlinedInput
+        <TextField
           autoFocus
           required
           margin="dense"
@@ -100,33 +107,54 @@ function CreateUserDialog({ open, handleClose: setOpen }) {
           id="utorid"
           name="utorid"
           label="utorid"
-          placeholder="utorid"
           type="text"
           onChange={(e) => setUtorid(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              "&.MuiInputLabel-shrink": {
+                transform: "translate(8px, -17px) scale(0.75)",
+              }
+            }
+          }}
           fullWidth
         />
-        <OutlinedInput
+        <TextField
           required
           margin="dense"
           value={name}
           id="name"
           name="name"
           label="name"
-          placeholder="name"
           type="text"
           onChange={(e) => setName(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              "&.MuiInputLabel-shrink": {
+                transform: "translate(8px, -17px) scale(0.75)",
+              }
+            }
+          }}
           fullWidth
         />
-        <OutlinedInput
+        <TextField
           required
           margin="dense"
           value={email}
           id="email"
           name="email"
           label="email"
-          placeholder="email"
           type="email"
           onChange={(e) => setEmail(e.target.value)}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              "&.MuiInputLabel-shrink": {
+                transform: "translate(8px, -17px) scale(0.75)",
+              }
+            }
+          }}
           fullWidth
         />
       </DialogContent>

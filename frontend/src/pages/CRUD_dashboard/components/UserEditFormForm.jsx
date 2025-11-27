@@ -17,9 +17,10 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router';
+import { useAuth } from "../../../contexts/AuthContext";
 import dayjs, { Dayjs } from 'dayjs';
 
-export default function PromotionForm({
+export default function UserEditFormForm({
   formState,
   onFieldChange,
   onSubmit,
@@ -27,6 +28,7 @@ export default function PromotionForm({
   submitButtonLabel,
   backButtonPath,
 }) {
+  const { currentUser } = useAuth();
   const formValues = formState.values || {};
   const formErrors = formState.errors || {};
 
@@ -63,6 +65,13 @@ export default function PromotionForm({
     [onFieldChange],
   );
 
+  const handleCheckboxFieldChange = React.useCallback(
+    (event, checked) => {
+      onFieldChange(event.target.name, checked);
+    },
+    [onFieldChange],
+  );
+
   const handleDateFieldChange = React.useCallback(
     (fieldName) => (value) => {
       if (value && value.isValid && value.isValid()) {
@@ -88,7 +97,7 @@ export default function PromotionForm({
   }, [formValues, onReset]);
 
   const handleBack = React.useCallback(() => {
-    navigate(backButtonPath || '/promotions');
+    navigate(backButtonPath || '/users');
   }, [navigate, backButtonPath]);
 
 return (
@@ -102,131 +111,87 @@ return (
     >
       <FormGroup>
         <Grid container spacing={2} sx={{ mb: 2, width: '100%' }}>
-          {/* Name */}
+          {/* Email */}
           <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
             <TextField
-              value={formValues.name ?? ''}
+              value={formValues.email ?? ''}
               onChange={handleTextFieldChange}
-              name="name"
-              label="Name"
-              error={!!formErrors.name}
-              helperText={formErrors.name ?? ' '}
+              name="email"
+              label="Email"
+              error={!!formErrors.email}
+              helperText={formErrors.email ?? ' '}
               fullWidth
             />
           </Grid>
 
-          {/* Type */}
+          {/* Role */}
           <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
-            <FormControl error={!!formErrors.type} fullWidth>
-              <InputLabel id="promotion-type-label">Type</InputLabel>
+            <FormControl error={!!formErrors.role} fullWidth>
+              <InputLabel id="role-label">Role</InputLabel>
               <Select
-                labelId="promotion-type-label"
-                name="type"
-                label="Type"
-                value={formValues.type ?? ''}
+                labelId="role-label"
+                name="role"
+                label="Role"
+                value={formValues.role ?? ''}
                 onChange={handleSelectFieldChange}
-                fullWidth
               >
-                <MenuItem value="automatic">Automatic</MenuItem>
-                <MenuItem value="one-time">One-time</MenuItem>
+                {(() => {
+                  const optionsForRole = {
+                    manager: ["regular", "cashier"],
+                    superuser: ["regular", "cashier", "manager", "superuser"],
+                  };
+
+                  const allowedOptions = optionsForRole[currentUser?.role] || [];
+
+                  return allowedOptions.map((role) => (
+                    <MenuItem key={role} value={role}>
+                      {role.charAt(0).toUpperCase() + role.slice(1)}
+                    </MenuItem>
+                  ));
+                })()}
               </Select>
-              <FormHelperText>{formErrors.type ?? ' '}</FormHelperText>
+              <FormHelperText>{formErrors.role ?? ' '}</FormHelperText>
             </FormControl>
           </Grid>
 
-          {/* Description */}
+          {/* Verified */}
           <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
-            <TextField
-              value={formValues.description ?? ''}
-              onChange={handleTextFieldChange}
-              name="description"
-              label="Description"
-              multiline
-              minRows={3}
-              error={!!formErrors.description}
-              helperText={formErrors.description ?? ' '}
-              fullWidth
-            />
-          </Grid>
-
-          {/* Start time */}
-          <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateTimePicker
-                value={
-                  formValues.startTime ? dayjs(formValues.startTime) : null
+            <FormControl>
+              <FormControlLabel
+                name="verified"
+                control={
+                  <Checkbox
+                    size="large"
+                    checked={formValues.verified ?? false}
+                    onChange={handleCheckboxFieldChange}
+                  />
                 }
-                onChange={handleDateFieldChange('startTime')}
-                label="Start time"
-                slotProps={{
-                  textField: {
-                    error: !!formErrors.startTime,
-                    helperText: formErrors.startTime ?? ' ',
-                    fullWidth: true,
-                  },
-                }}
+                label="Verified"
               />
-            </LocalizationProvider>
+              <FormHelperText error={!!formErrors.verified}>
+                {formErrors.verified ?? ' '}
+              </FormHelperText>
+            </FormControl>
           </Grid>
 
-          {/* End time */}
+          {/* Suspicious */}
           <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DateTimePicker
-                value={formValues.endTime ? dayjs(formValues.endTime) : null}
-                onChange={handleDateFieldChange('endTime')}
-                label="End time"
-                slotProps={{
-                  textField: {
-                    error: !!formErrors.endTime,
-                    helperText: formErrors.endTime ?? ' ',
-                    fullWidth: true,
-                  },
-                }}
+            <FormControl>
+              <FormControlLabel
+                name="suspicious"
+                control={
+                  <Checkbox
+                    size="large"
+                    checked={formValues.suspicious ?? false}
+                    onChange={handleCheckboxFieldChange}
+                  />
+                }
+                label="Suspicious"
               />
-            </LocalizationProvider>
-          </Grid>
-
-          {/* Min spending */}
-          <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
-            <TextField
-              type="number"
-              value={formValues.minSpending ?? ''}
-              onChange={handleNumberFieldChange}
-              name="minSpending"
-              label="Min spending"
-              error={!!formErrors.minSpending}
-              helperText={formErrors.minSpending ?? ' '}
-              fullWidth
-            />
-          </Grid>
-
-          {/* Rate */}
-          <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
-            <TextField
-              type="number"
-              value={formValues.rate ?? ''}
-              onChange={handleNumberFieldChange}
-              name="rate"
-              label="Rate (e.g. 0.02)"
-              error={!!formErrors.rate}
-              helperText={formErrors.rate ?? ' '}
-              fullWidth
-            />
-          </Grid>
-
-          {/* Points */}
-          <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
-            <TextField
-              type="number"
-              value={formValues.points ?? ''}
-              onChange={handleNumberFieldChange}
-              name="points"
-              label="Points"
-              error={!!formErrors.points}
-              helperText={formErrors.points ?? ' '}
-              fullWidth
-            />
+              <FormHelperText error={!!formErrors.suspicious}>
+                {formErrors.suspicious ?? ' '}
+              </FormHelperText>
+            </FormControl>
           </Grid>
         </Grid>
       </FormGroup>
