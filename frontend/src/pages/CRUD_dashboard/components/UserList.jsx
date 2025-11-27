@@ -14,20 +14,18 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useDialogs } from '../hooks/useDialogs/useDialogs';
 import useNotifications from '../hooks/useNotifications/useNotifications';
 import PageContainer from './PageContainer';
 import {
     getMany,
-    deleteOne,
-} from '../data/promotions';
+} from '../data/users';
 import ColorModeIconDropdown from "../../../shared-theme/ColorModeIconDropdown";
 
 const INITIAL_PAGE_SIZE = 10;
 
-export default function PromotionList() {
+export default function UserList() {
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -132,42 +130,13 @@ export default function PromotionList() {
 
   const handleRowClick = React.useCallback(
     ({ row }) => {
-      navigate(`/promotions/${row.id}`);
+      navigate(`/users/${row.id}`);
     },
     [navigate],
   );
 
-  const handleCreateClick = () => navigate('/promotions/new');
-  const handleRowEdit = (promo) => () => navigate(`/promotions/${promo.id}/edit`);
-
-  const handleRowDelete = (promo) => async () => {
-    const confirmed = await dialogs.confirm(
-      `Delete promotion "${promo.name}"?`,
-      {
-        title: 'Delete Promotion',
-        severity: 'error',
-        okText: 'Delete',
-        cancelText: 'Cancel',
-      }
-    );
-
-    if (!confirmed) return;
-
-    setIsLoading(true);
-    try {
-      await deleteOne(promo.id);
-      notifications.show('Promotion deleted successfully.', {
-        severity: 'success'
-      });
-      loadData();
-    } catch (err) {
-      notifications.show(
-        `Failed to delete promotion. ${err.message}`,
-        { severity: 'error' }
-      );
-    }
-    setIsLoading(false);
-  };
+  const handleCreateClick = () => navigate('/users/new');
+  const handleRowEdit = (promo) => () => navigate(`/users/${promo.id}/edit`);
 
   const initialState = React.useMemo(
     () => ({
@@ -176,61 +145,33 @@ export default function PromotionList() {
     [],
   );
 
+  const dateTimeFormatter = (value) => {
+    if (!value) return '-';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return '-';
+    return d.toLocaleString();
+  };
+
+  const dateFormatter = (value) => {
+    if (!value) return '-';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return '-';
+    return d.toLocaleDateString();
+  };
+
   const columns = React.useMemo(() => {
     const baseColumns = [
-      { field: 'id', headerName: 'ID', width: 80 },
-      { field: 'name', headerName: 'Name', flex: 1, minWidth: 150 },
-      { field: 'description', headerName: 'Description', flex: 2, minWidth: 200 },
-      { field: 'type', headerName: 'Type', width: 150 },
-      {
-        field: 'minSpending',
-        headerName: 'Min Spending',
-        width: 150,
-        valueFormatter: (value) => {
-        if (value == null) return '-';
-        const num = Number(value);
-        if (Number.isNaN(num)) return '-';
-        return `$${num.toFixed(2)}`;
-        },
-      },
-
-      {
-        field: 'rate',
-        headerName: 'Rate',
-        width: 100,
-        valueFormatter: (value) => {
-        if (value == null) return '-';
-        const num = Number(value);
-        if (Number.isNaN(num)) return '-';
-        return `${(num * 100).toFixed(0)}%`;
-        },
-      },
-
-      { field: 'points', headerName: 'Points', width: 100 },
-
-      {
-        field: 'startTime',
-        headerName: 'Start Time',
-        width: 160,
-        valueFormatter: (value) => {
-        if (!value) return '-';
-        const d = new Date(value);
-        if (Number.isNaN(d.getTime())) return '-';
-        return d.toLocaleString();
-        },
-      },
-    
-      {
-        field: 'endTime',
-        headerName: 'End Time',
-        width: 160,
-        valueFormatter: (value) => {
-        if (!value) return '-';
-        const d = new Date(value);
-        if (Number.isNaN(d.getTime())) return '-';
-        return d.toLocaleString();
-        },
-      },
+      { field: 'id', headerName: 'ID', flex: 1, minWidth: 50, type: 'number' },
+      { field: 'utorid', headerName: 'Utorid', flex: 1, minWidth: 120, type: 'string' },
+      { field: 'name', headerName: 'Name', flex: 1, minWidth: 150, type: 'string' },
+      { field: 'email', headerName: 'Email', flex: 1, minWidth: 250, type: 'string' },
+      { field: 'birthday', headerName: 'Birthday', minWidth: 130, type: 'date', valueFormatter: dateFormatter },
+      { field: 'role', headerName: 'Role', flex: 1, minWidth: 120, type: 'string' },
+      { field: 'points', headerName: 'Points', flex: 1, minWidth: 80, type: 'number' },
+      { field: 'createdAt', headerName: 'CreatedAt', flex: 1, minWidth: 160, type: 'dateTime', valueFormatter: dateTimeFormatter },
+      { field: 'lastLogin', headerName: 'LastLogin', flex: 1, minWidth: 160, type: 'dateTime', valueFormatter: dateTimeFormatter },
+      { field: 'verified', headerName: 'Verified', flex: 1, minWidth: 80, type: 'boolean' },
+      { field: 'avatarUrl', headerName: 'AvatarUrl', flex: 1, minWidth: 200, type: 'string' },
     ];
 
     if (isManager) {
@@ -246,21 +187,15 @@ export default function PromotionList() {
           label="Edit"
           onClick={handleRowEdit(row)}
         />,
-        <GridActionsCellItem
-          key="delete"
-          icon={<DeleteIcon />}
-          label="Delete"
-          onClick={handleRowDelete(row)}
-        />,
       ],
     });
   }
-  return baseColumns;}, [isManager, handleRowEdit, handleRowDelete]);
+  return baseColumns;}, [isManager, handleRowEdit]);
 
   return (
     <PageContainer
-      title="Promotions"
-      breadcrumbs={[{ title: 'Promotions' }]}
+      title="Users"
+      breadcrumbs={[{ title: 'Users' }]}
       actions={
         <Stack direction="row" alignItems="center" spacing={1}>
           <Tooltip title="Refresh" placement="right">

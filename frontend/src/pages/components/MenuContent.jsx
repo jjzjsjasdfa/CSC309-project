@@ -17,17 +17,36 @@ import { useAuth } from '../../contexts/AuthContext';
 import * as React from "react";
 import CreateUserDialog from "../../components/CreateUserDialog";
 import ChangeMyPasswordDialog from "../../components/ChangeMyPasswordDialog";
+import EditMyInfoDialog from "../EditMyInfoDialog";
 
 export default function MenuContent() {
   const { currentUser, removeTokenAndUser } = useAuth();
   const navigate = useNavigate();
   const [userCreationDialogOpen, setUserCreationDialogOpen] = React.useState(false);
   const [changeMyPasswordDialogOpen, setChangeMyPasswordDialogOpen] = React.useState(false);
+  const [editMyInfoDialogOpen, setEditMyInfoDialogOpen] = React.useState(false);
 
   const mainListItems = [
-    { text: 'Home', icon: <HomeRoundedIcon />, href: '/me' },
-    { text: 'Promotions', icon: <LocalOfferIcon />, href: '/promotions' },
-    { text: 'Users', icon: <GroupIcon />, href: '/employees' },
+    { text: 'Home',
+      icon: <HomeRoundedIcon />,
+      href: '/me',
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
+    },
+    { text: 'Template',
+      icon: <LocalOfferIcon />,
+      href: '/employees',
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
+    },
+    { text: 'Users',
+      icon: <GroupIcon />,
+      href: '/users',
+      allowedRoles: ['manager', 'superuser'],
+    },
+    { text: 'Promotions',
+      icon: <LocalOfferIcon />,
+      href: '/promotions',
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
+    },
   ];
 
   const secondaryListItems = [
@@ -40,14 +59,14 @@ export default function MenuContent() {
     {
       text: 'Edit My Info',
       icon: <Person2Icon />,
-      onClick: () => navigate('/me/account'),
-      allowedRoles: null,
+      onClick: () => setEditMyInfoDialogOpen(true),
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
     {
       text: 'Change My Password',
       icon: <PasswordIcon />,
       onClick: () => setChangeMyPasswordDialogOpen(true),
-      allowedRoles: null,
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
     {
       text: 'Logout',
@@ -56,7 +75,7 @@ export default function MenuContent() {
         removeTokenAndUser();
         navigate('/');
       },
-      allowedRoles: null,
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
   ];
 
@@ -66,19 +85,23 @@ export default function MenuContent() {
     <>
       <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
         <List dense>
-          {mainListItems.map((item, index) => (
-            <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton component={RouterLink} to={item.href || "#"}
-                selected={window.location.pathname === item.href}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          {mainListItems.map((item, index) => {
+            const allowed = userRole && item.allowedRoles.includes(userRole);
+            if (!allowed) return null;
+            return (
+              <ListItem key={index} disablePadding sx={{display: 'block'}}>
+                <ListItemButton component={RouterLink} to={item.href || "/"}
+                                selected={window.location.pathname === item.href}>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text}/>
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         </List>
         <List dense>
           {secondaryListItems.map((item, index) => {
-            const allowed = !item.allowedRoles || (userRole && item.allowedRoles?.includes(userRole));
+            const allowed = userRole && item.allowedRoles.includes(userRole);
             if (!allowed) return null;
             return (
               <ListItem key={index} disablePadding sx={{ display: 'block' }}>
@@ -93,6 +116,7 @@ export default function MenuContent() {
       </Stack>
       <CreateUserDialog open={userCreationDialogOpen} handleClose={setUserCreationDialogOpen} />
       <ChangeMyPasswordDialog open={changeMyPasswordDialogOpen} handleClose={setChangeMyPasswordDialogOpen} />
+      <EditMyInfoDialog open={editMyInfoDialogOpen} handleClose={setEditMyInfoDialogOpen} />
     </>
   );
 }
