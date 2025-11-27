@@ -22,6 +22,7 @@ import PromotionList from './pages/CRUD_dashboard/components/PromotionList';
 import PromotionShow from './pages/CRUD_dashboard/components/PromotionShow';
 import PromotionCreate from './pages/CRUD_dashboard/components/PromotionCreate';
 import PromotionEdit from './pages/CRUD_dashboard/components/PromotionEdit';
+import ResetPassword from './pages/ResetPassword';
 
 
 export default function App() {
@@ -38,6 +39,8 @@ export default function App() {
               <Route path="me/account" element={<EditMySelfPage />} />
               <Route path="*" element={<NotFound />} />
             </Route>
+
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
             {/* promotion */}
             <Route path="promotions" element={<CrudDashboard />}>

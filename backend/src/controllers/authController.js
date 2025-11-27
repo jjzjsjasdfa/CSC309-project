@@ -1,5 +1,6 @@
 const authService = require("../services/authService");
 const userService = require("../services/userService");
+const emailService = require("../services/emailService");
 
 const jwt = require("jsonwebtoken");
 const userRepository = require("../repositories/userRepository");
@@ -48,7 +49,19 @@ const authController = {
     user = await userService.updateUserByUtorid(utorid, { resetToken, expiresAt });
     rateLimitMap.set(ip, now);
 
-    return res.status(202).json({ expiresAt, resetToken });
+    try {
+      if (!user.email) {
+         return res.status(400).json({ error: "This account has no email address linked." });
+      }
+
+      await emailService.sendResetLink(user.email, resetToken);
+
+      return res.status(200).json({ message: "Reset link has been sent to your email." });
+
+    } catch (error) {
+      console.error("Email error:", error);
+      return res.status(500).json({ error: "Failed to send email. Please try again later." });
+    }
   },
 
   async resetPassword(req, res) {
