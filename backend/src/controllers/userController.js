@@ -103,7 +103,7 @@ const userController = {
     // don't care when verified === false
     if (req.body.verified !== undefined) {
       if (!/^(true)$/.test(req.body.verified)) {
-        return res.status(400).json({ error: "verified field should be boolean" });
+        return res.status(400).json({ error: "verified field should always be true" });
       }
       updateData.verified = req.body.verified;
     }

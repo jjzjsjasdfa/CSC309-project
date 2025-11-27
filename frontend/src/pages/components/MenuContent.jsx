@@ -18,17 +18,27 @@ import { useAuth } from '../../contexts/AuthContext';
 import * as React from "react";
 import CreateUserDialog from "../../components/CreateUserDialog";
 import ChangeMyPasswordDialog from "../../components/ChangeMyPasswordDialog";
+import EventIcon from '@mui/icons-material/Event';
+import EditMyInfoDialog from "../EditMyInfoDialog";
 
 export default function MenuContent() {
   const { currentUser, removeTokenAndUser } = useAuth();
   const navigate = useNavigate();
   const [userCreationDialogOpen, setUserCreationDialogOpen] = React.useState(false);
   const [changeMyPasswordDialogOpen, setChangeMyPasswordDialogOpen] = React.useState(false);
+  const [editMyInfoDialogOpen, setEditMyInfoDialogOpen] = React.useState(false);
 
   const mainListItems = [
-    { text: 'Home',
+    {
+      text: 'Home',
       icon: <HomeRoundedIcon />,
       href: '/me',
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
+    },
+
+    { text: 'Template',
+      icon: <LocalOfferIcon />,
+      href: '/employees',
       allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
     { text: 'Users',
@@ -36,7 +46,8 @@ export default function MenuContent() {
       href: '/users',
       allowedRoles: ['manager', 'superuser'],
     },
-    { text: 'Promotions',
+    {
+      text: 'Promotions',
       icon: <LocalOfferIcon />,
       href: '/promotions',
       allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
@@ -46,6 +57,12 @@ export default function MenuContent() {
       href: '/transactions',
       allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
+    {
+      text: 'Events',
+      icon: <EventIcon />,
+      href: '/events',
+      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
+    }
   ];
 
   const secondaryListItems = [
@@ -58,7 +75,7 @@ export default function MenuContent() {
     {
       text: 'Edit My Info',
       icon: <Person2Icon />,
-      onClick: () => navigate('/me/account'),
+      onClick: () => setEditMyInfoDialogOpen(true),
       allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
     {
@@ -88,11 +105,11 @@ export default function MenuContent() {
             const allowed = userRole && item.allowedRoles.includes(userRole);
             if (!allowed) return null;
             return (
-              <ListItem key={index} disablePadding sx={{display: 'block'}}>
+              <ListItem key={index} disablePadding sx={{ display: 'block' }}>
                 <ListItemButton component={RouterLink} to={item.href || "/"}
-                                selected={window.location.pathname === item.href}>
+                  selected={window.location.pathname === item.href}>
                   <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.text}/>
+                  <ListItemText primary={item.text} />
                 </ListItemButton>
               </ListItem>
             );
@@ -115,6 +132,7 @@ export default function MenuContent() {
       </Stack>
       <CreateUserDialog open={userCreationDialogOpen} handleClose={setUserCreationDialogOpen} />
       <ChangeMyPasswordDialog open={changeMyPasswordDialogOpen} handleClose={setChangeMyPasswordDialogOpen} />
+      <EditMyInfoDialog open={editMyInfoDialogOpen} handleClose={setEditMyInfoDialogOpen} />
     </>
   );
 }
