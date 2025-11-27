@@ -6,12 +6,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import TextField from '@mui/material/TextField';
 import { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
+import useNotifications from '../pages/CRUD_dashboard/hooks/useNotifications/useNotifications';
 
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
@@ -26,6 +24,7 @@ function EditMyInfoDialog({ open, handleClose: setOpen }) {
     email: '',
     birthday: '',
   });
+  const notifications = useNotifications();
   const { token, storeCurrentUser } = useAuth();
 
   const clearData = () => {
@@ -144,7 +143,11 @@ function EditMyInfoDialog({ open, handleClose: setOpen }) {
 
               // success
               setError(false);
-              setDialogContentText('Your information has been updated.');
+              notifications.show(`Your information has been updated!`, {
+                severity: 'success',
+                autoHideDuration: 3000,
+              });
+              setDialogContentText('Your information has been updated!');
               setOriginalData({
                 name,
                 email,
@@ -156,7 +159,6 @@ function EditMyInfoDialog({ open, handleClose: setOpen }) {
               setBirthday(birthday);
 
               storeCurrentUser(data);
-              clearData();
             } catch (err) {
               setError(true);
               setDialogContentText(err.message);
@@ -195,7 +197,14 @@ function EditMyInfoDialog({ open, handleClose: setOpen }) {
           label="name"
           type="text"
           onChange={(e) => setName(e.target.value)}
-          InputLabelProps={{ shrink: true }}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              "&.MuiInputLabel-shrink": {
+                transform: "translate(8px, -17px) scale(0.75)",
+              }
+            }
+          }}
           fullWidth
         />
 
@@ -208,7 +217,14 @@ function EditMyInfoDialog({ open, handleClose: setOpen }) {
           label="email"
           type="email"
           onChange={(e) => setEmail(e.target.value)}
-          InputLabelProps={{ shrink: true }}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              "&.MuiInputLabel-shrink": {
+                transform: "translate(8px, -17px) scale(0.75)",
+              }
+            }
+          }}
           fullWidth
         />
 
@@ -221,7 +237,14 @@ function EditMyInfoDialog({ open, handleClose: setOpen }) {
           label="birthday"
           type="date"
           onChange={(e) => setBirthday(e.target.value)}
-          InputLabelProps={{ shrink: true }}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              "&.MuiInputLabel-shrink": {
+                transform: "translate(8px, -17px) scale(0.75)",
+              }
+            }
+          }}
           fullWidth
         />
 

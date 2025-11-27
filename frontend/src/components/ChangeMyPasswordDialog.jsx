@@ -10,6 +10,7 @@ import {useEffect} from "react";
 import { useAuth } from '../contexts/AuthContext.jsx';
 import {useNavigate} from "react-router-dom";
 import TextField from "@mui/material/TextField";
+import useNotifications from '../pages/CRUD_dashboard/hooks/useNotifications/useNotifications';
 
 const VITE_BACKEND_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
@@ -20,6 +21,7 @@ function ChangeMyPasswordDialog({ open, handleClose: setOpen }) {
   const [error, setError] = React.useState(false);
   const [dialogContentText, setDialogContentText] = React.useState('');
   const navigate = useNavigate();
+  const notifications = useNotifications();
   const { token } = useAuth();
 
   useEffect(() => {
@@ -79,6 +81,10 @@ function ChangeMyPasswordDialog({ open, handleClose: setOpen }) {
             // success
             clearData();
             setError(false);
+            notifications.show(`Password has been changed! Please login again.`, {
+              severity: 'success',
+              autoHideDuration: 3000,
+            });
             setDialogContentText(`Password has been changed! Please login again.`);
             setIsReset(true);
           },
@@ -109,7 +115,14 @@ function ChangeMyPasswordDialog({ open, handleClose: setOpen }) {
           label="Old Password"
           type="password"
           onChange={(e) => setOld(e.target.value)}
-          InputLabelProps={{ shrink: true }}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              "&.MuiInputLabel-shrink": {
+                transform: "translate(8px, -17px) scale(0.75)",
+              }
+            }
+          }}
           fullWidth
         />
         <TextField
@@ -121,14 +134,21 @@ function ChangeMyPasswordDialog({ open, handleClose: setOpen }) {
           label="New Password"
           type="password"
           onChange={(e) => setNew(e.target.value)}
-          InputLabelProps={{ shrink: true }}
+          InputLabelProps={{
+            shrink: true,
+            sx: {
+              "&.MuiInputLabel-shrink": {
+                transform: "translate(8px, -17px) scale(0.75)",
+              }
+            }
+          }}
           fullWidth
         />
       </DialogContent>
       <DialogActions sx={{ pb: 3, px: 3 }}>
         <Button onClick={handleClose}>Close</Button>
         <Button variant="contained" type="submit">
-          Create
+          Change
         </Button>
       </DialogActions>
     </Dialog>

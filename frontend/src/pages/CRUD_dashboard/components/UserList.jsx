@@ -15,8 +15,6 @@ import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { useDialogs } from '../hooks/useDialogs/useDialogs';
-import useNotifications from '../hooks/useNotifications/useNotifications';
 import PageContainer from './PageContainer';
 import {
     getMany,
@@ -31,9 +29,6 @@ export default function UserList() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const isManager = ['manager', 'superuser'].includes(currentUser?.role);
-
-  const dialogs = useDialogs();
-  const notifications = useNotifications();
 
   const [paginationModel, setPaginationModel] = React.useState({
     page: searchParams.get('page') ? Number(searchParams.get('page')) : 0,
