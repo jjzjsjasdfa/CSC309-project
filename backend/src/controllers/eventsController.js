@@ -209,10 +209,10 @@ const eventController = {
       if(Boolean(event.published) === false) {
         return res.status(404).json({ message: "event not found" });
       }
-      const { id, name, description, location, startTime, endTime, capacity, organizers,numGuests
+      const { id, name, description, location, startTime, endTime, capacity, organizers,guests,numGuests
       } = event;
       return res.status(200).json({ id, name, description, location, startTime, endTime, capacity, 
-        organizers, numGuests
+        organizers,guests, numGuests
       });
     }
     catch(error){

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../../contexts/AuthContext.jsx";
 import {
 	Container, Typography, Grid, Card, CardContent, Button, TextField, FormControlLabel, Checkbox,
 	Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
@@ -33,7 +33,12 @@ function EventDetailPage() {
 	const [isPublished, setIsPublished] = useState(false);
 	const [addOrganizerClicked, setAddOrganizerClicked] = useState(false);
 	const [organizerFormData, setOrganizerFormData] = useState("");
+	const [guestFormData, setGuestFormData] = useState({});
+	const [addGuestClicked, setAddGuestClicked] = useState(false);
+	const [deleteGuestClicked, setDeleteGuestClicked] = useState(false);
+	const [awardGuestClicked, setAwardGuestClicked] = useState(false);
 	const [organizers, setOrganizers] = useState([]);
+	const [guests, setGuests] = useState([]);
 
 
 
@@ -64,6 +69,7 @@ function EventDetailPage() {
 				setEvent(data);
 				setIsPublished(data.published);
 				setOrganizers(data.organizers);
+				setGuests(data.guests);
 
 			} catch (err) {
 				setError(err.message || "Failed to load events");
@@ -77,7 +83,7 @@ function EventDetailPage() {
 		} else {
 			setError("No authentication token found. Please sign in.");
 		}
-	}, [token, eventId, event]);
+	}, [token, eventId]);
 
 
 	if (!event) {
@@ -91,10 +97,36 @@ function EventDetailPage() {
 		);
 	}
 
-
-
 	let organizerIds = organizers.map(organizer => organizer.id);
 	let isOrganizer = organizerIds.includes(currentUser.id);
+
+	const refetchEvent = async () => {
+		try {
+			const res = await fetch(`${VITE_BACKEND_URL}/events/${eventId}`, {
+				method: "GET",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"Content-Type": "application/json",
+				},
+			});
+
+			if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+
+			const data = await res.json();
+			setEvent(data);
+			setIsPublished(data.published);
+			setOrganizers(data.organizers);
+			setGuests(data.guests);
+		} catch (err) {
+			setError(err.message || "Failed to reload event");
+		}
+	};
+
+
+
+
+	let guestIds = guests.map(guest => guest.id);
+	let isGuest = guestIds.includes(currentUser.id);
 
 	let draftColumns = [
 		{ field: 'name', headerName: 'Name', flex: 2 },
@@ -161,6 +193,30 @@ function EventDetailPage() {
 
 	}
 
+	const handleGuestChange = (e) => {
+		const { name, value, type, checked } = e.target;
+		if (addGuestClicked || awardGuestClicked) {
+			if (name === "utorid") {
+				let newGuestFromData = guestFormData;
+				newGuestFromData["utorid"] = value;
+				setGuestFormData(newGuestFromData);
+			}
+		}
+		if (deleteGuestClicked) {
+			setGuestFormData({ "id": value });
+		}
+	}
+
+	const handleAwardGuestChange = (e) => {
+		const { name, value, type, checked } = e.target;
+		if (name === "amount") {
+			let newGuestFromData = guestFormData;
+			newGuestFromData["amount"] = parseInt(value);
+			setGuestFormData(newGuestFromData);
+		}
+
+	}
+
 	const handleApply = async () => {
 		let newFormData = {};
 		for (let key in formData) {
@@ -187,9 +243,7 @@ function EventDetailPage() {
 			const data = await res.json();
 			console.log("successfully updated event: ", eventId, data);
 
-			const updatedEvent = { ...event, ...data };
-
-			setEvent(updatedEvent);
+			await refetchEvent();
 			if (newFormData.published === true) {
 				setIsPublished(true);
 			}
@@ -202,6 +256,22 @@ function EventDetailPage() {
 
 	const handleAddOrganizer = () => {
 		setAddOrganizerClicked(!addOrganizerClicked);
+	}
+
+	const handleAddGuest = () => {
+		setDeleteGuestClicked(false);
+		setAwardGuestClicked(false);
+		setAddGuestClicked(!addGuestClicked);
+	}
+	const handleDeleteGuest = () => {
+		setAddGuestClicked(false);
+		setAwardGuestClicked(false);
+		setDeleteGuestClicked(!deleteGuestClicked);
+	}
+	const handleAwardGuest = () => {
+		setAddGuestClicked(false);
+		setDeleteGuestClicked(false);
+		setAwardGuestClicked(!awardGuestClicked);
 	}
 
 	const handleOrganizerApply = async () => {
@@ -225,11 +295,116 @@ function EventDetailPage() {
 
 			const data = await res.json();
 			console.log(data);
-			setOrganizers(data.organizers);
+			await refetchEvent();
 
 
 		} catch (err) {
 			setError(err.message || "Failed to update event");
+		}
+
+	}
+
+	const handleGuestAddApply = async () => {
+
+		try {
+			let res;
+			if (addGuestClicked) {
+				res = await fetch(`${VITE_BACKEND_URL}/events/${eventId}/guests`, {
+					method: "POST",
+					headers: {
+						Authorization: `Bearer ${token}`,
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(guestFormData)
+				});
+			} else if (deleteGuestClicked) {
+				res = await fetch(`${VITE_BACKEND_URL}/events/${eventId}/guests/${guestFormData.id}`, {
+					method: "DELETE",
+					headers: {
+						Authorization: `Bearer ${token}`,
+						"Content-Type": "application/json",
+					}
+				});
+			}
+			else if (awardGuestClicked) {
+
+
+				let payload = {};
+				if (guestFormData["utorid"] && guestFormData["utorid"].trim() !== "") {
+					payload["utorid"] = guestFormData["utorid"];
+				}
+
+				if (guestFormData["amount"]) {
+					payload["amount"] = guestFormData["amount"];
+				}
+				payload["type"] = "event";
+				res = await fetch(`${VITE_BACKEND_URL}/events/${eventId}/transactions`, {
+					method: "POST",
+					headers: {
+						Authorization: `Bearer ${token}`,
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(payload),
+				});
+			}
+			if (res) {
+				if (!res.ok) {
+					const errorData = await res.json();
+					console.error("Error response:", errorData);
+					throw new Error(errorData.error || errorData.message || `Failed to dd organizer for event: ${res.status}`);
+				}
+			}
+			await refetchEvent();
+
+
+		} catch (err) {
+			setError(err.message || "Failed to update event");
+		}
+
+	}
+
+	const handleJoin = async () => {
+		try {
+			const res = await fetch(`${VITE_BACKEND_URL}/events/${eventId}/guests/me`, {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"Content-Type": "application/json",
+				}
+			});
+
+			if (!res.ok) {
+				const errorData = await res.json();
+				console.error("Error response:", errorData);
+				throw new Error(errorData.error || errorData.message || `Failed to join event: ${res.status}`);
+			}
+			await refetchEvent();
+			isGuest = !isGuest;
+		} catch (err) {
+			setError(err.message || "Failed to join event");
+		}
+
+	}
+
+	const handleQuit = async () => {
+		try {
+			const res = await fetch(`${VITE_BACKEND_URL}/events/${eventId}/guests/me`, {
+				method: "Delete",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"Content-Type": "application/json",
+				}
+			});
+
+			if (!res.ok) {
+				const errorData = await res.json();
+				console.error("Error response:", errorData);
+				throw new Error(errorData.error || errorData.message || `Failed to join event: ${res.status}`);
+			}
+			await refetchEvent();
+			isGuest = !isGuest;
+		} catch (err) {
+			setError(err.message || "Failed to join event");
 		}
 
 	}
@@ -240,6 +415,16 @@ function EventDetailPage() {
 				<Typography variant="h6" sx={{ mb: 2 }}>
 					Event Information
 				</Typography>
+				{(!isOrganizer) && (!isGuest) &&
+					(<Button onClick={handleJoin} sx={{ mt: 2 }}>
+						Join
+					</Button>)
+				}
+				{(isGuest) &&
+					(<Button onClick={handleQuit} sx={{ mt: 2 }}>
+						Quit
+					</Button>)
+				}
 				{(currentUser.role === "manager" || currentUser.role === "superuser" || isOrganizer) && (
 					<Box sx={{ mb: 2 }}>
 						<Button onClick={handleUpdate} sx={{ mt: 2 }}>
@@ -257,7 +442,6 @@ function EventDetailPage() {
 						columns={columns}
 						pageSizeOptions={[10, 20, 50]}
 						initialState={{ pagination: { paginationModel: { pageSize: 10, page: 0 } } }}
-						onRowClick={(params) => handleRowClick(params.row)}
 						sx={{
 							"& .MuiDataGrid-row:hover": {
 								backgroundColor: "#c2ebefff",
@@ -358,7 +542,6 @@ function EventDetailPage() {
 								]}
 								pageSizeOptions={[10, 20, 50]}
 								initialState={{ pagination: { paginationModel: { pageSize: 10, page: 0 } } }}
-								onRowClick={(params) => handleRowClick(params.row)}
 								sx={{
 									"& .MuiDataGrid-row:hover": {
 										backgroundColor: "#c2ebefff",
@@ -387,8 +570,83 @@ function EventDetailPage() {
 					</Grid>)
 				}
 
-			</Box>
+				{(currentUser.role === "manager" || currentUser.role === "superuser" || isOrganizer) && (
+					<div>
+						<Typography variant="h6" sx={{ mb: 2, marginTop: "5%" }}>
+							Guests
+						</Typography>
+						<Button onClick={handleAddGuest} sx={{ mt: 2 }}>
+							Add
+						</Button>
+						<Button onClick={handleAwardGuest} sx={{ mt: 2 }}>
+							Award
+						</Button>
+						{(!isOrganizer) && (
+							<Button onClick={handleDeleteGuest} sx={{ mt: 2 }}>
+								Delete
+							</Button>
+						)}
+						<div style={{ display: 'flex', flexDirection: 'column' }}>
+							<DataGrid
+								rows={guests}
+								columns={[
+									{ field: 'id', headerName: 'ID', flex: 2 },
+									{ field: 'utorid', headerName: 'UTORid', flex: 2 },
+									{ field: 'name', headerName: 'Name', flex: 2 },
+									{ field: 'email', headerName: 'Email', flex: 2 }
+								]}
+								pageSizeOptions={[10, 20, 50]}
+								initialState={{ pagination: { paginationModel: { pageSize: 10, page: 0 } } }}
+								sx={{
+									"& .MuiDataGrid-row:hover": {
+										backgroundColor: "#c2ebefff",
+										cursor: 'pointer'
+									}
+								}}
+							/>
+						</div>
+					</div>)}
 
+				{(addGuestClicked || deleteGuestClicked || awardGuestClicked) &&
+					(<Grid container spacing={2} sx={{ mt: 2 }}>
+						<Grid item xs={12}>
+							{(addGuestClicked) &&
+								(<TextField
+									fullWidth
+									label="UTORid"
+									name="utorid"
+									onChange={handleGuestChange}
+								/>)}
+							{(deleteGuestClicked) &&
+								(<TextField
+									fullWidth
+									label="ID"
+									name="id"
+									onChange={handleGuestChange}
+								/>)}
+							{(awardGuestClicked) &&
+								(<Box>
+									<TextField
+										fullWidth
+										label="Utorid"
+										name="utorid"
+										onChange={handleGuestChange}
+									/>
+									<TextField
+										fullWidth
+										label="Amount"
+										name="amount"
+										onChange={handleAwardGuestChange}
+									/>
+								</Box>
+								)}
+						</Grid>
+						<Grid item xs={12}>
+							<Button variant="contained" onClick={handleGuestAddApply}>Apply</Button>
+						</Grid>
+					</Grid>)
+				}
+			</Box>
 		</Container>
 	)
 }

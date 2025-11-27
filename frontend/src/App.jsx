@@ -18,9 +18,8 @@ import PromotionList from './pages/CRUD_dashboard/components/PromotionList';
 import PromotionShow from './pages/CRUD_dashboard/components/PromotionShow';
 import PromotionCreate from './pages/CRUD_dashboard/components/PromotionCreate';
 import PromotionEdit from './pages/CRUD_dashboard/components/PromotionEdit';
-import EventsDashboard from "./pages/EventsDashboard"
-import EventDetailPage from './pages/EventDetailPage';
-import EventDetailDashboard from './pages/EventDetailDashboard.jsx';
+import EventDetailPage from './pages/CRUD_dashboard/components/EventDetailPage'
+import UserEventsPage from './pages/CRUD_dashboard/components/UserEventsPage'
 
 
 export default function App() {
@@ -35,8 +34,6 @@ export default function App() {
               <Route index element={<SignIn />} />
               <Route path="me" element={<Dashboard />} />
               <Route path="me/account" element={<EditMySelfPage />} />
-              <Route path="me/events" element={<EventsDashboard />} />
-              <Route path="me/events/:eventId" element={<EventDetailDashboard />} />
               <Route path="*" element={<NotFound />} />
             </Route>
 
@@ -48,6 +45,15 @@ export default function App() {
               <Route path=":promotionId/edit" element={<PromotionEdit />} />
               <Route path="*" element={<PromotionList />} />
             </Route>
+
+            {/* Event */}
+            <Route path="events" element={<CrudDashboard />}>
+              <Route index element={<UserEventsPage />} />
+              <Route path=":eventId" element={<EventDetailPage />} />
+              <Route path="*" element={<UserEventsPage />} />
+            </Route>
+
+
 
             {/* template */}
             <Route path="employees" element={<CrudDashboard />}>

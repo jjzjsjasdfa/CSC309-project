@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../../contexts/AuthContext.jsx";
 import {
 	Container, Typography, Grid, Card, CardContent, Button, TextField, FormControlLabel, Checkbox,
 	Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
