@@ -35,12 +35,6 @@ export default function MenuContent() {
       href: '/me',
       allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
     },
-
-    { text: 'Template',
-      icon: <LocalOfferIcon />,
-      href: '/employees',
-      allowedRoles: ['regular', 'cashier', 'manager', 'superuser'],
-    },
     { text: 'Users',
       icon: <GroupIcon />,
       href: '/users',

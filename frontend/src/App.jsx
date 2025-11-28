@@ -73,15 +73,6 @@ export default function App() {
               <Route path="*" element={<UserEventsPage />} />
             </Route>
 
-            {/* template */}
-            <Route path="employees" element={<CrudDashboard />}>
-              <Route index element={<EmployeeList />} />
-              <Route path="new" element={<EmployeeCreate />} />
-              <Route path=":employeeId" element={<EmployeeShow />} />
-              <Route path=":employeeId/edit" element={<EmployeeEdit />} />
-              <Route path="*" element={<EmployeeList />} />
-            </Route>
-
             {/* transactions */}
             <Route path="transactions" element={<CrudDashboard />}>
               <Route index element={<TransactionList />} />

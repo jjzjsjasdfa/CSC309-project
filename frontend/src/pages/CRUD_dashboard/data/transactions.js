@@ -11,33 +11,44 @@ function getAuthHeaders() {
 }
 
 // get all transactions
-export async function getMany() {
-    const res = await fetch(`${VITE_BACKEND_URL}/transactions?limit=999999999`, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            ...getAuthHeaders(),
-        },
+export async function getMany(userRole) {
+  let res;
+  if(['manager', 'superuser'].includes(userRole)) {
+    res = await fetch(`${VITE_BACKEND_URL}/transactions?limit=999999999`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeaders(),
+      },
     });
+  } else{
+    res = await fetch(`${VITE_BACKEND_URL}/users/me/transactions`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeaders(),
+      },
+    });
+  }
 
-    const text = await res.text();
-    let data = null;
+  const text = await res.text();
+  let data = null;
 
-    if (text) {
-        try {
-            data = JSON.parse(text);
-        } catch (e) {
-            console.error(e);
-        }
-    }
+  if (text) {
+      try {
+          data = JSON.parse(text);
+      } catch (e) {
+          console.error(e);
+      }
+  }
 
-    if (!res.ok) {
-        throw new Error((data && data.error) || `Failed to fetch transactions`);
-    }
+  if (!res.ok) {
+      throw new Error((data && data.error) || `Failed to fetch transactions`);
+  }
 
-    const results = data && Array.isArray(data.results) ? data.results : [];
-    const count = data && typeof data.count === "number" ? data.count : results.length;
-    return { items: results, itemCount: count };
+  const results = data && Array.isArray(data.results) ? data.results : [];
+  const count = data && typeof data.count === "number" ? data.count : results.length;
+  return { items: results, itemCount: count };
 }
 
 // get one transaction
