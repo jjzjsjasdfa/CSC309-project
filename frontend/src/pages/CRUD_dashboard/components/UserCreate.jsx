@@ -4,19 +4,14 @@ import useNotifications from '../hooks/useNotifications/useNotifications';
 import {
   createOne as createUser,
   validate as validateUser,
-} from '../data/promotions';
+} from '../data/users';
 import UserCreateForm from './UserCreateForm';
 import PageContainer from './PageContainer';
 
 const INITIAL_FORM_VALUES = {
+  utorid: '',
   name: '',
-  description: '',
-  type: 'automatic',
-  startTime: null,
-  endTime: null,
-  minSpending: null,
-  rate: null,
-  points: null,
+  email: '',
 };
 
 export default function UserCreate() {

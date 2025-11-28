@@ -77,7 +77,7 @@ export async function getOne(promotionId) {
  * POST promotion
  */
 export async function createOne(promotionData) {
-  const res = await fetch(`${VITE_BACKEND_URL}/promotions`, {
+  const res = await fetch(`${VITE_BACKEND_URL}/promotions?limit=999999999`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

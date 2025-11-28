@@ -14,7 +14,7 @@ function getAuthHeaders() {
  * GET all users
  */
 export async function getMany() {
-  const res = await fetch(`${VITE_BACKEND_URL}/users`, {
+  const res = await fetch(`${VITE_BACKEND_URL}/users?limit=999999999`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

@@ -12,7 +12,7 @@ function getAuthHeaders() {
 
 // get all transactions
 export async function getMany() {
-    const res = await fetch(`${VITE_BACKEND_URL}/transactions`, {
+    const res = await fetch(`${VITE_BACKEND_URL}/transactions?limit=999999999`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
