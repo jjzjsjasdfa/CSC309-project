@@ -30,7 +30,7 @@ export default function TransactionList() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await getMany();
+      const data = await getMany(currentUser.role);
       setRows(data.items || []);
     } catch (err) {
       console.error(err);
