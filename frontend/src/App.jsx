@@ -8,12 +8,7 @@ import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./contexts/AuthContext";
 import Dashboard from "./pages/Dashboard";
-import EditMySelfPage from "./pages/EditMyInfoDialog";
 import CrudDashboard from "./pages/CRUD_dashboard/CrudDashboard";
-import EmployeeList from './pages/CRUD_dashboard/components/EmployeeList';
-import EmployeeShow from './pages/CRUD_dashboard/components/EmployeeShow';
-import EmployeeCreate from './pages/CRUD_dashboard/components/EmployeeCreate';
-import EmployeeEdit from './pages/CRUD_dashboard/components/EmployeeEdit';
 import UserList from './pages/CRUD_dashboard/components/UserList';
 import UserShow from './pages/CRUD_dashboard/components/UserShow';
 import UserCreate from './pages/CRUD_dashboard/components/UserCreate';
@@ -42,7 +37,6 @@ export default function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<SignIn />} />
               <Route path="me" element={<Dashboard />} />
-              <Route path="me/account" element={<EditMySelfPage />} />
               <Route path="*" element={<NotFound />} />
             </Route>
 
