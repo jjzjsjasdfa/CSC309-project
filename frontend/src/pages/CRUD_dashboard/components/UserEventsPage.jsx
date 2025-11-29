@@ -9,23 +9,41 @@ import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import { useNavigate } from "react-router-dom";
+import {
+	Dialog,
+	DialogTitle,
+	DialogContent,
+	DialogActions
+} from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import useNotifications from '../hooks/useNotifications/useNotifications';
+import AddIcon from '@mui/icons-material/Add';
+import PageContainer from './PageContainer';
+import ColorModeIconDropdown from "../../../shared-theme/ColorModeIconDropdown";
+import Tooltip from '@mui/material/Tooltip';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import IconButton from '@mui/material/IconButton';
 
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 
 function UserEventsPage() {
 	const nav = useNavigate();
+	const notifications = useNotifications();
 	const { token, currentUser } = useAuth();
 	const [loading, setLoading] = useState(false);
 	const [events, setEvents] = useState([]);
 	const [error, setError] = useState("");
-	const [createClicked, setCreateClicked] = useState(false);
+	const [openCreateDialog, setOpenCreateDialog] = useState(false);
 	const [formData, setFormData] = useState({
 		name: "",
 		description: "",
 		location: "",
-		startTime: "",
-		endTime: "",
+		startTime: dayjs(),
+		endTime: dayjs(),
 		capacity: "",
 		points: ""
 	});
@@ -65,7 +83,26 @@ function UserEventsPage() {
 		} else {
 			setError("No authentication token found. Please sign in.");
 		}
-	}, [token, events]);
+	}, [token]);
+
+	const refetchEvent = async () => {
+		try {
+			const res = await fetch(`${VITE_BACKEND_URL}/events`, {
+				method: "GET",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"Content-Type": "application/json",
+				},
+			});
+
+			if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+
+			const data = await res.json();
+			setEvents(data.results || []);
+		} catch (err) {
+			setError(err.message || "Failed to reload event");
+		}
+	};
 
 
 	let draftColumns = [
@@ -91,8 +128,8 @@ function UserEventsPage() {
 	const handleCreate = async () => {
 		let newFormData = {
 			...formData,
-			startTime: new Date(formData.startTime).toISOString(),
-			endTime: new Date(formData.endTime).toISOString(),
+			startTime: formData.startTime.toISOString(),
+			endTime: formData.endTime.toISOString(),
 			capacity: formData.capacity ? Number(formData.capacity) : null,
 			points: Number(formData.points)
 		};
@@ -114,13 +151,23 @@ function UserEventsPage() {
 
 			const data = await res.json();
 
-			const updatedEvents = { ...events, ...data };
-
+			const updatedEvents = [...events, data];
 			setEvents(updatedEvents);
+			notifications.show('Event created successfully.', {
+				severity: 'success',
+				autoHideDuration: 3000,
+			});
 
 
 		} catch (err) {
 			setError(err.message || "Failed to create event");
+			notifications.show(
+				`Failed to create event. Reason: ${err.message}`,
+				{
+					severity: 'error',
+					autoHideDuration: 3000,
+				},
+			);
 		}
 	};
 
@@ -136,19 +183,37 @@ function UserEventsPage() {
 		setFormData(newFormData);
 	}
 	return (
-		<Container>
+		<PageContainer
+			title="Events"
+			breadcrumbs={[{ title: "Events" }]}
+			actions={
+				<Box sx={{ display: "flex", gap: 1 }}>
+					<Tooltip title="Refresh" placement="right">
+						<IconButton onClick={refetchEvent}>
+							<RefreshIcon />
+						</IconButton>
+					</Tooltip>
+
+					{(currentUser.role === "manager" || currentUser.role === "superuser") && (
+						<Button
+							variant="contained"
+							onClick={() => setOpenCreateDialog(true)}
+							startIcon={<AddIcon />}
+						>
+							Create
+						</Button>
+					)}
+				</Box>
+			}
+		>
+			<Box sx={{ position: 'fixed', top: '0.75rem', right: '2.25rem', zIndex: 1000 }}>
+				<ColorModeIconDropdown />
+			</Box>
 			<Box sx={{ width: '100%' }}>
 				<div style={{ display: 'flex', flexDirection: 'column' }}>
-					<Typography variant="h6" sx={{ mb: 2 }}>
-						All Events
-					</Typography>
-					{(currentUser.role === "manager" || currentUser.role === "superuser") && (
-						<Box sx={{ mb: 2 }}>
-							<Button onClick={() => { setCreateClicked(!createClicked) }} sx={{ mt: 2 }}>
-								Create
-							</Button>
-						</Box>)}
+
 					<DataGrid
+						showToolbar
 						autoHeight
 						rows={events}
 						columns={columns}
@@ -163,71 +228,94 @@ function UserEventsPage() {
 						}}
 					/>
 				</div>
-				{(createClicked) &&
-					(<Grid container spacing={2} sx={{ mt: 2 }}>
-						<Grid item xs={12}>
+				<LocalizationProvider dateAdapter={AdapterDayjs}>
+					<Dialog
+						open={openCreateDialog}
+						onClose={() => setOpenCreateDialog(false)}
+						fullWidth
+						maxWidth="sm"
+					>
+						<DialogTitle>Create Event</DialogTitle>
+
+						<DialogContent dividers>
+
 							<TextField
 								fullWidth
+								margin="dense"
 								label="Name"
 								name="name"
 								onChange={handleChange}
 							/>
-						</Grid>
-						<Grid item xs={12}>
+
 							<TextField
 								fullWidth
+								margin="dense"
 								label="Description"
 								name="description"
 								onChange={handleChange}
 							/>
-						</Grid>
-						<Grid item xs={12}>
+
 							<TextField
 								fullWidth
+								margin="dense"
 								label="Location"
 								name="location"
 								onChange={handleChange}
 							/>
-						</Grid>
-						<Grid item xs={12}>
-							<TextField
-								fullWidth
+
+							<DateTimePicker
 								label="Start Time"
-								name="startTime"
-								onChange={handleChange}
+								value={formData.startTime}
+								onChange={(v) =>
+									setFormData(prev => ({ ...prev, startTime: v }))
+								}
+								sx={{ mt: 2 }}
 							/>
-						</Grid>
-						<Grid item xs={12}>
-							<TextField
-								fullWidth
+
+							<DateTimePicker
 								label="End Time"
-								name="endTime"
-								onChange={handleChange}
+								value={formData.endTime}
+								onChange={(v) =>
+									setFormData(prev => ({ ...prev, endTime: v }))
+								}
+								sx={{ mt: 2 }}
 							/>
-						</Grid>
-						<Grid item xs={12}>
+
 							<TextField
 								fullWidth
+								margin="dense"
 								label="Capacity"
 								name="capacity"
 								onChange={handleChange}
 							/>
-						</Grid>
-						<Grid item xs={12}>
+
 							<TextField
 								fullWidth
+								margin="dense"
 								label="Points"
 								name="points"
 								onChange={handleChange}
 							/>
-						</Grid>
-						<Grid item xs={12}>
-							<Button variant="contained" onClick={handleCreate}>Create</Button>
-						</Grid>
-					</Grid>)
-				}
+
+						</DialogContent>
+
+						<DialogActions>
+							<Button onClick={() => setOpenCreateDialog(false)}>Cancel</Button>
+							<Button
+								variant="contained"
+								onClick={async () => {
+									await handleCreate();
+									setOpenCreateDialog(false);
+								}}
+							>
+								Create
+							</Button>
+						</DialogActions>
+
+					</Dialog>
+				</LocalizationProvider>
 			</Box>
-		</Container>
+		</PageContainer >
 	)
 }
 
