@@ -13,6 +13,7 @@ const INITIAL_VALUES = {
   amount: '',
   relatedId: '',
   remark: '',
+  promotionIds: [],
 };
 
 export default function TransactionCreate() {
@@ -24,13 +25,12 @@ export default function TransactionCreate() {
     setFormState(prev => ({
       ...prev,
       values: { ...prev.values, [name]: value },
-      errors: {},
+      errors: { ...prev.errors, [name]: undefined },
     }));
   };
 
   const handleSubmit = async () => {
     const { values } = formState;
-
     const { issues } = validate(values);
     if (issues && issues.length > 0) {
       const errs = {};
@@ -39,7 +39,6 @@ export default function TransactionCreate() {
       return;
     }
 
-    // only send fields that are relevant to the specific Transaction Type
     let payload = {
         type: values.type,
         remark: values.remark
@@ -48,11 +47,13 @@ export default function TransactionCreate() {
     if (values.type === 'purchase') {
         payload.utorid = values.utorid;
         payload.spent = Number(values.spent);
+        payload.promotionIds = values.promotionIds; 
     } 
     else if (values.type === 'adjustment') {
         payload.utorid = values.utorid;
         payload.amount = Number(values.amount);
         payload.relatedId = Number(values.relatedId);
+        payload.promotionIds = values.promotionIds;
     } 
     else if (values.type === 'transfer') {
         payload.amount = Number(values.amount);
@@ -63,7 +64,6 @@ export default function TransactionCreate() {
     }
 
     try {
-      // 3. Send the clean payload
       await createOne(payload);
       notifications.show('Transaction created successfully.', { severity: 'success' });
       navigate('/transactions');

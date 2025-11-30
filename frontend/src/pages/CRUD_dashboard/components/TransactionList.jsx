@@ -20,6 +20,8 @@ import ColorModeIconDropdown from "../../../shared-theme/ColorModeIconDropdown";
 export default function TransactionList() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  
+  const isManager = ['manager', 'superuser'].includes(currentUser?.role);
   const canCreate = ['regular', 'cashier', 'manager', 'superuser'].includes(currentUser?.role);
 
   const [rows, setRows] = React.useState([]);
@@ -37,93 +39,102 @@ export default function TransactionList() {
       setError(err);
     }
     setIsLoading(false);
-  }, []);
+  }, [currentUser.role]);
 
   React.useEffect(() => { loadData(); }, [loadData]);
 
-  const columns = React.useMemo(() => [
-    { field: 'id', headerName: 'ID', width: 70 },
-    
-    { 
-      field: 'type', 
-      headerName: 'Type', 
-      width: 130,
-      renderCell: (params) => (
-        <Chip 
-          label={params.value} 
-          color="primary" 
-          variant="outlined" 
-          size="small" 
-          sx={{ textTransform: 'capitalize' }} 
-        />
-      )
-    },
-
-    { field: 'utorid', headerName: 'User', width: 120 },
-
-    { 
-      field: 'spent', 
-      headerName: 'Spent', 
-      width: 100,
-      valueFormatter: (value) => {
-        if (value == null) return '-';
-        return `$${Number(value).toFixed(2)}`;
-      }
-    },
-
-    // points column
-    { 
-      field: 'amount', 
-      headerName: 'Points', 
-      width: 120,
-      renderCell: (params) => {
-        const value = params.row.amount ?? params.row.earned;
+  const columns = React.useMemo(() => {
+    const cols = [
+        { field: 'id', headerName: 'ID', width: 70 },
         
-        if (value == null) return '-';
+        { 
+        field: 'type', 
+        headerName: 'Type', 
+        width: 130,
+        renderCell: (params) => (
+            <Chip 
+            label={params.value} 
+            color="primary" 
+            variant="outlined" 
+            size="small" 
+            sx={{ textTransform: 'capitalize' }} 
+            />
+        )
+        },
 
-        return (
-          <Box sx={{ 
-            color: value < 0 ? 'error.main' : 'success.main', 
-            fontWeight: 'bold' 
-          }}>
-            {value > 0 ? '+' : ''}{value}
-          </Box>
-        );
-      }
-    },
+        { field: 'utorid', headerName: 'User', width: 120 },
 
-    { 
-      field: 'suspicious', 
-      headerName: 'Suspicious', 
-      width: 100,
-      type: 'boolean'
-    },
+        { 
+        field: 'spent', 
+        headerName: 'Spent', 
+        width: 100,
+        valueFormatter: (value) => {
+            if (value == null) return '-';
+            return `$${Number(value).toFixed(2)}`;
+        }
+        },
 
-    { 
-      field: 'createdAt', 
-      headerName: 'Date', 
-      width: 180,
-      valueFormatter: (value) => {
-        if (!value) return '-';
-        return new Date(value).toLocaleString();
-      }
-    },
+        { 
+        field: 'amount', 
+        headerName: 'Points', 
+        width: 120,
+        renderCell: (params) => {
+            let value = params.row.amount ?? params.row.earned;
+            
+            if (value == null) return '-';
 
-    {
-      field: 'actions',
-      type: 'actions',
-      headerName: 'Actions',
-      width: 80,
-      getActions: ({ row }) => [
-        <GridActionsCellItem
-          key="view"
-          icon={<VisibilityIcon />}
-          label="View"
-          onClick={() => navigate(`/transactions/${row.id}`)}
-        />
-      ]
+            if (params.row.type === 'redemption') {
+                value = -Math.abs(value);
+            }
+
+            return (
+            <Box sx={{ 
+                color: value < 0 ? 'error.main' : 'success.main', 
+                fontWeight: 'bold' 
+            }}>
+                {value > 0 ? '+' : ''}{value}
+            </Box>
+            );
+        }
+        },
+
+        { 
+        field: 'createdAt', 
+        headerName: 'Date', 
+        width: 180,
+        valueFormatter: (value) => {
+            if (!value) return '-';
+            return new Date(value).toLocaleString();
+        }
+        },
+    ];
+
+    if (isManager) {
+        cols.push({ 
+            field: 'suspicious', 
+            headerName: 'Suspicious', 
+            width: 100,
+            type: 'boolean'
+        });
+
+        cols.push({
+            field: 'actions',
+            type: 'actions',
+            headerName: 'Actions',
+            width: 80,
+            getActions: ({ row }) => [
+                <GridActionsCellItem
+                    key="view"
+                    icon={<VisibilityIcon />}
+                    label="View"
+                    onClick={() => navigate(`/transactions/${row.id}`)}
+                />
+            ]
+        });
     }
-  ], [navigate]);
+
+    return cols;
+  }, [navigate, isManager]);
 
   return (
     <PageContainer
@@ -156,7 +167,7 @@ export default function TransactionList() {
       <Box sx={{ flex: 1, width: '100%' }}>
         {error ? (
           <Alert severity="error">
-            {error.message || "Failed to load transactions. Is the backend running?"}
+            {error.message || "Failed to load transactions."}
           </Alert>
         ) : (
           <DataGrid
@@ -166,7 +177,7 @@ export default function TransactionList() {
             autoHeight
             initialState={{ 
               pagination: { paginationModel: { pageSize: 10 } },
-              sorting: { sortModel: [{ field: 'id', sort: 'desc' }] } // Newest first
+              sorting: { sortModel: [{ field: 'id', sort: 'desc' }] }
             }}
             pageSizeOptions={[5, 10, 25]}
             disableRowSelectionOnClick

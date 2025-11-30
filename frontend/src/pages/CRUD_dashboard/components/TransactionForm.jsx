@@ -9,49 +9,82 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import Chip from '@mui/material/Chip';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Checkbox from '@mui/material/Checkbox';
+import ListItemText from '@mui/material/ListItemText';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router';
+import { useAuth } from '../../../contexts/AuthContext';
+import { getMany as getPromotions } from '../data/promotions';
 
 const shouldShowField = (type, fieldName) => {
-  if (!type) return false;
-  const config = {
-    purchase: ['utorid', 'spent', 'remark'],
-    adjustment: ['utorid', 'amount', 'relatedId', 'remark'],
-    transfer: ['recipientId', 'amount', 'remark'],
-    redemption: ['amount', 'remark'],
-  };
-  return config[type]?.includes(fieldName);
+    if (!type) return false;
+    const config = {
+        purchase: ['utorid', 'spent', 'remark', 'promotionIds'],
+        adjustment: ['utorid', 'amount', 'relatedId', 'remark', 'promotionIds'],
+        transfer: ['recipientId', 'amount', 'remark'],
+        redemption: ['amount', 'remark'],
+    };
+    return config[type]?.includes(fieldName);
 };
 
 export default function TransactionForm({
-  formState,
-  onFieldChange,
-  onSubmit,
-  submitButtonLabel,
-  backButtonPath,
+    formState,
+    onFieldChange,
+    onSubmit,
+    submitButtonLabel,
+    backButtonPath,
 }) {
-  const formValues = formState.values || {};
-  const formErrors = formState.errors || {};
-  const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const { currentUser } = useAuth();
+    const formValues = formState.values || {};
+    const formErrors = formState.errors || {};
+    const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [availablePromotions, setAvailablePromotions] = React.useState([]);
 
-  const handleSubmit = React.useCallback(async (event) => {
-      event.preventDefault();
-      setIsSubmitting(true);
-      try { await onSubmit(formValues); } finally { setIsSubmitting(false); }
+    React.useEffect(() => {
+        const loadPromotions = async () => {
+        try {
+            const data = await getPromotions();
+            setAvailablePromotions(data.items || []);
+        } catch (err) {
+            console.error("Failed to load promotions", err);
+        }
+        };
+        loadPromotions();
+    }, []);
+
+    console.log("Current User Role:", currentUser?.role);
+
+    const role = currentUser?.role;
+    const isCashier = ['cashier', 'manager', 'superuser'].includes(role);
+    const isManager = ['manager', 'superuser'].includes(role);
+
+    const handleSubmit = React.useCallback(async (event) => {
+        event.preventDefault();
+        setIsSubmitting(true);
+        try { await onSubmit(formValues); } finally { setIsSubmitting(false); }
     }, [formValues, onSubmit]);
 
-  const handleChange = (event) => onFieldChange(event.target.name, event.target.value);
+    const handleChange = (e) => onFieldChange(e.target.name, e.target.value);
   
-  const handleNumberChange = (event) => {
-    const val = event.target.value;
-    const num = val === '' ? null : Number(val);
-    onFieldChange(event.target.name, num);
-  };
+    const handleNumberChange = (e) => {
+        const val = e.target.value;
+        const num = val === '' ? null : Number(val);
+        onFieldChange(e.target.name, num);
+    };
 
-  return (
+    const handlePromotionChange = (event) => {
+        const { target: { value },} = event;
+        const val = typeof value === 'string' ? value.split(',') : value;
+        onFieldChange('promotionIds', val);
+    };
+
+    return (
     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%', maxWidth: '1000px', margin: '0 auto' }}>
       <Grid container spacing={3} sx={{ mb: 3 }}>
+        
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth error={!!formErrors.type} sx={{ minWidth: '200px' }}>
             <InputLabel id="tx-type-label">Transaction Type</InputLabel>
@@ -62,16 +95,17 @@ export default function TransactionForm({
               value={formValues.type || ''}
               onChange={handleChange}
             >
-              <MenuItem value="purchase">Purchase (Cashier)</MenuItem>
-              <MenuItem value="adjustment">Adjustment (Manager)</MenuItem>
               <MenuItem value="transfer">Transfer (User)</MenuItem>
               <MenuItem value="redemption">Redemption (User)</MenuItem>
+              {isCashier && <MenuItem value="purchase">Purchase (Cashier)</MenuItem>}
+              {isManager && <MenuItem value="adjustment">Adjustment (Manager)</MenuItem>}
             </Select>
             <FormHelperText>{formErrors.type}</FormHelperText>
           </FormControl>
         </Grid>
 
         <Grid item xs={12} sm={6} />
+
         {shouldShowField(formValues.type, 'utorid') && (
           <Grid item xs={12} sm={6}>
             <TextField
@@ -90,17 +124,17 @@ export default function TransactionForm({
           <Grid item xs={12} sm={6}>
             <TextField
               name="recipientId"
-              label="Recipient UTORID (User ID)"
+              label="Recipient User ID"
+              type="number"
               value={formValues.recipientId || ''}
-              onChange={handleChange}
+              onChange={handleNumberChange}
               error={!!formErrors.recipientId}
-              helperText={formErrors.recipientId}
+              helperText={formErrors.recipientId || "Enter the numeric User ID (e.g. 5)"}
               fullWidth
             />
           </Grid>
         )}
 
-        {/* spent, only for purchase */}
         {shouldShowField(formValues.type, 'spent') && (
           <Grid item xs={12} sm={6}>
             <TextField
@@ -116,7 +150,6 @@ export default function TransactionForm({
           </Grid>
         )}
 
-        {/* amount, for adjustment, transfer, redemption */}
         {shouldShowField(formValues.type, 'amount') && (
           <Grid item xs={12} sm={6}>
             <TextField
@@ -132,7 +165,6 @@ export default function TransactionForm({
           </Grid>
         )}
 
-        {/* Related ID, for adjustment */}
         {shouldShowField(formValues.type, 'relatedId') && (
           <Grid item xs={12} sm={6}>
             <TextField
@@ -145,6 +177,38 @@ export default function TransactionForm({
               helperText={formErrors.relatedId}
               fullWidth
             />
+          </Grid>
+        )}
+
+        {shouldShowField(formValues.type, 'promotionIds') && (
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <InputLabel id="promo-select-label">Apply Promotions</InputLabel>
+              <Select
+                labelId="promo-select-label"
+                id="promo-select"
+                multiple
+                value={formValues.promotionIds || []}
+                onChange={handlePromotionChange}
+                input={<OutlinedInput label="Apply Promotions" />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((value) => {
+                      const promo = availablePromotions.find(p => p.id === value);
+                      return <Chip key={value} label={promo ? promo.name : value} />;
+                    })}
+                  </Box>
+                )}
+              >
+                {availablePromotions.map((promo) => (
+                  <MenuItem key={promo.id} value={promo.id}>
+                    <Checkbox checked={(formValues.promotionIds || []).indexOf(promo.id) > -1} />
+                    <ListItemText primary={promo.name} secondary={promo.type} />
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>Select one or more promotions to apply</FormHelperText>
+            </FormControl>
           </Grid>
         )}
 
