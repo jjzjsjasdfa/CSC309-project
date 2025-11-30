@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext.jsx";
 import {
-	Container, Typography, Grid, Card, CardContent, Button, TextField, FormControlLabel, Checkbox,
-	Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
+	Container, Typography, Button, TextField, FormControlLabel, Checkbox,
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
@@ -20,7 +19,6 @@ import dayjs from "dayjs";
 import useNotifications from '../hooks/useNotifications/useNotifications';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
 import GroupOffIcon from '@mui/icons-material/GroupOff';
@@ -42,10 +40,7 @@ function EventDetailPage() {
 	const notifications = useNotifications();
 	const { eventId } = useParams();
 	const { token, currentUser } = useAuth();
-	const [loading, setLoading] = useState(false);
 	const [event, setEvent] = useState(null);
-	const [error, setError] = useState("");
-	const [updateClicked, setUpdateClicked] = useState(false);
 	const [formData, setFormData] = useState({
 		name: "",
 		description: "",
@@ -57,8 +52,6 @@ function EventDetailPage() {
 		published: "",
 	});
 	const [isPublished, setIsPublished] = useState(false);
-	const [openAddOrganizerDialog, setOpenAddOrganizerDialog] = useState(false);
-	const [addOrganizerClicked, setAddOrganizerClicked] = useState(false);
 	const [organizerFormData, setOrganizerFormData] = useState("");
 	const [guestFormData, setGuestFormData] = useState({});
 	const [addGuestClicked, setAddGuestClicked] = useState(false);
@@ -77,8 +70,6 @@ function EventDetailPage() {
 
 	useEffect(() => {
 		async function loadEvents() {
-			setLoading(true);
-			setError("");
 
 			try {
 				const res = await fetch(`${VITE_BACKEND_URL}/events/${eventId}`, {
@@ -103,16 +94,26 @@ function EventDetailPage() {
 				setGuests(data.guests);
 
 			} catch (err) {
-				setError(err.message || "Failed to load events");
-			} finally {
-				setLoading(false);
+				notifications.show(
+					`Failed to load event. Reason: ${err.message}`,
+					{
+						severity: 'error',
+						autoHideDuration: 3000,
+					},
+				);
 			}
 		}
 
 		if (token && eventId) {
 			loadEvents();
 		} else {
-			setError("No authentication token found. Please sign in.");
+			notifications.show(
+				"No authentication token found. Please sign in.",
+				{
+					severity: 'error',
+					autoHideDuration: 3000,
+				},
+			);
 		}
 	}, [token, eventId]);
 
@@ -149,7 +150,13 @@ function EventDetailPage() {
 			setOrganizers(data.organizers);
 			setGuests(data.guests);
 		} catch (err) {
-			setError(err.message || "Failed to reload event");
+			notifications.show(
+				`Failed to load event. Reason: ${err.message}`,
+				{
+					severity: 'error',
+					autoHideDuration: 3000,
+				},
+			);
 		}
 	};
 
@@ -204,7 +211,6 @@ function EventDetailPage() {
 			if (!res.ok) {
 				throw new Error(`Failed to delete event: ${res.status}`);
 			}
-			console.log("successfully deleted event: ", eventId);
 			nav("/events");
 			notifications.show('Event deleted successfully.', {
 				severity: 'success',
@@ -213,7 +219,6 @@ function EventDetailPage() {
 
 		}
 		catch (err) {
-			setError(err.message || "Failed to load events");
 			notifications.show(
 				`Failed to delete event. Reason: ${err.message}`,
 				{
@@ -225,10 +230,6 @@ function EventDetailPage() {
 	};
 
 
-	const handleUpdate = () => {
-		setUpdateClicked(!updateClicked);
-	}
-
 	const handleChange = (e) => {
 		const { name, value, type, checked } = e.target;
 		let newFormData = { ...formData };
@@ -239,19 +240,17 @@ function EventDetailPage() {
 			newFormData[name] = value;
 		}
 		setFormData(newFormData);
-		console.log(newFormData);
 
 	}
 
 	const handleOrganizerChange = (e) => {
-		const { name, value, type, checked } = e.target;
+		const { value } = e.target;
 		setOrganizerFormData({ "utorid": value });
-		console.log(organizerFormData);
 
 	}
 
 	const handleGuestChange = (e) => {
-		const { name, value, type, checked } = e.target;
+		const { name, value } = e.target;
 		if (addGuestClicked || awardGuestClicked) {
 			if (name === "utorid") {
 				let newGuestFromData = guestFormData;
@@ -265,7 +264,7 @@ function EventDetailPage() {
 	}
 
 	const handleAwardGuestChange = (e) => {
-		const { name, value, type, checked } = e.target;
+		const { name, value } = e.target;
 		if (name === "amount") {
 			let newGuestFromData = guestFormData;
 			newGuestFromData["amount"] = parseInt(value);
@@ -299,12 +298,8 @@ function EventDetailPage() {
 
 			if (!res.ok) {
 				const errorData = await res.json();
-				console.error("Error response:", errorData);
 				throw new Error(errorData.error || errorData.message || `Failed to update event: ${res.status}`);
 			}
-
-			const data = await res.json();
-			console.log("successfully updated event: ", eventId, data);
 
 			await refetchEvent();
 			if (typeof newFormData.published === "boolean") {
@@ -317,7 +312,6 @@ function EventDetailPage() {
 
 
 		} catch (err) {
-			setError(err.message || "Failed to update event");
 			notifications.show(
 				`Failed to update event. Reason: ${err.message}`,
 				{
@@ -352,12 +346,8 @@ function EventDetailPage() {
 
 			if (!res.ok) {
 				const errorData = await res.json();
-				console.error("Error response:", errorData);
-				throw new Error(errorData.error || errorData.message || `Failed to dd organizer for event: ${res.status}`);
+				throw new Error(errorData.error || errorData.message || `Failed to add organizer for event: ${res.status}`);
 			}
-
-			const data = await res.json();
-			console.log(data);
 			await refetchEvent();
 			notifications.show('Organizer added successfully.', {
 				severity: 'success',
@@ -366,7 +356,6 @@ function EventDetailPage() {
 
 
 		} catch (err) {
-			setError(err.message || "Failed to update event");
 			notifications.show(
 				`Failed to add organizer. Reason: ${err.message}`,
 				{
@@ -447,15 +436,13 @@ function EventDetailPage() {
 			if (res) {
 				if (!res.ok) {
 					const errorData = await res.json();
-					console.error("Error response:", errorData);
-					throw new Error(errorData.error || errorData.message || `Failed to dd organizer for event: ${res.status}`);
+					throw new Error(errorData.error || errorData.message || `Operation failed. Reason: ${res.status}`);
 				}
 			}
 			await refetchEvent();
 			notify();
 
 		} catch (err) {
-			setError(err.message || "Failed to update event");
 			notifications.show(
 				`Operation failed. Reason: ${err.message}`,
 				{
@@ -479,7 +466,6 @@ function EventDetailPage() {
 
 			if (!res.ok) {
 				const errorData = await res.json();
-				console.error("Error response:", errorData);
 				throw new Error(errorData.error || errorData.message || `Failed to join event: ${res.status}`);
 			}
 			await refetchEvent();
@@ -489,7 +475,6 @@ function EventDetailPage() {
 				autoHideDuration: 3000,
 			});
 		} catch (err) {
-			setError(err.message || "Failed to join event");
 			notifications.show(
 				`Failed to join. Reason: ${err.message}`,
 				{
@@ -513,8 +498,7 @@ function EventDetailPage() {
 
 			if (!res.ok) {
 				const errorData = await res.json();
-				console.error("Error response:", errorData);
-				throw new Error(errorData.error || errorData.message || `Failed to join event: ${res.status}`);
+				throw new Error(errorData.error || errorData.message || `Failed to quit event: ${res.status}`);
 			}
 			await refetchEvent();
 			isGuest = !isGuest;
@@ -523,7 +507,6 @@ function EventDetailPage() {
 				autoHideDuration: 3000,
 			});
 		} catch (err) {
-			setError(err.message || "Failed to join event");
 			notifications.show(
 				`Failed to quit. Reason: ${err.message}`,
 				{
@@ -834,12 +817,13 @@ function EventDetailPage() {
 					</DialogContent>
 
 					<DialogActions>
-						<Button onClick={() => { setOpenGuestDialog(false); setGuestFormData({}) }}>Cancel</Button>
+						<Button onClick={() => { setOpenGuestDialog(false); setGuestFormData({});}}>Cancel</Button>
 						<Button variant="contained"
 							onClick={
 								() => {
 									handleGuestAddApply();
 									setOpenGuestDialog(false);
+									setGuestFormData({});
 								}
 							}>
 							Apply
