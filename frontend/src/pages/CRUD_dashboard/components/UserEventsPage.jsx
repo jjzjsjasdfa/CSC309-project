@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext.jsx";
 import {
-	Container, Typography, Grid, Card, CardContent, Button, TextField, FormControlLabel, Checkbox,
-	Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
+	Button, TextField
 } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import Divider from '@mui/material/Divider';
 import { useNavigate } from "react-router-dom";
 import {
 	Dialog,
@@ -34,9 +31,7 @@ function UserEventsPage() {
 	const nav = useNavigate();
 	const notifications = useNotifications();
 	const { token, currentUser } = useAuth();
-	const [loading, setLoading] = useState(false);
 	const [events, setEvents] = useState([]);
-	const [error, setError] = useState("");
 	const [openCreateDialog, setOpenCreateDialog] = useState(false);
 	const [formData, setFormData] = useState({
 		name: "",
@@ -50,8 +45,6 @@ function UserEventsPage() {
 
 	useEffect(() => {
 		async function loadEvents() {
-			setLoading(true);
-			setError("");
 
 			try {
 				const res = await fetch(`${VITE_BACKEND_URL}/events`, {
@@ -72,16 +65,26 @@ function UserEventsPage() {
 				const data = await res.json();
 				setEvents(data.results || []);
 			} catch (err) {
-				setError(err.message || "Failed to load events");
-			} finally {
-				setLoading(false);
+				notifications.show(
+					`Failed to load event. Reason: ${err.message}`,
+					{
+						severity: 'error',
+						autoHideDuration: 3000,
+					},
+				);
 			}
 		}
 
 		if (token) {
 			loadEvents();
 		} else {
-			setError("No authentication token found. Please sign in.");
+			notifications.show(
+				`No authentication token found. Please sign in.`,
+				{
+					severity: 'error',
+					autoHideDuration: 3000,
+				},
+			);
 		}
 	}, [token]);
 
@@ -100,7 +103,13 @@ function UserEventsPage() {
 			const data = await res.json();
 			setEvents(data.results || []);
 		} catch (err) {
-			setError(err.message || "Failed to reload event");
+			notifications.show(
+				`Failed to load event. Reason: ${err.message}`,
+				{
+					severity: 'error',
+					autoHideDuration: 3000,
+				},
+			);
 		}
 	};
 
@@ -108,21 +117,38 @@ function UserEventsPage() {
 	let draftColumns = [
 		{ field: 'name', headerName: 'Name', flex: 2 },
 		{ field: 'location', headerName: 'Location', flex: 2 },
-		{ field: 'startTime', headerName: 'Start Time', flex: 2 },
-		{ field: 'endTime', headerName: 'End Time', flex: 2 },
-		{ field: 'capacity', headerName: 'Capacity', flex: 2 },
-		{ field: 'numGuests', headerName: '# of Guest', flex: 2 },
+		{
+			field: 'startTime', headerName: 'Start Time', flex: 2,
+			valueGetter: (value) => {
+				return value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : '';
+			},
+		},
+		{
+			field: 'endTime', headerName: 'End Time', flex: 2,
+			valueGetter: (value) => {
+				return value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : '';
+			},
+		},
+		{
+			field: 'capacity', headerName: 'Capacity', flex: 2,
+			valueGetter: (value) => {
+				return (value === null || value === "" || value === undefined) ? "Unlimited" : value;
+			}
+		}
 
 	];
 
 	let columns = (currentUser.role === "manager" || currentUser.role === "superuser")
-		? [...draftColumns, { field: 'published', headerName: 'Published', flex: 2 }]
-		: draftColumns;
+		? [...draftColumns, { field: 'pointsRemain', headerName: 'Points Remain', flex: 2 },
+		{ field: 'pointsAwarded', headerName: 'Points Awarded', flex: 2 },
+		{ field: 'published', headerName: 'Published', flex: 2 }]
+		: [...draftColumns, { field: 'numGuests', headerName: '# of Guest', flex: 2 }];
 
 
 	const handleRowClick = (row) => {
 		nav(`/events/${row.id}`);
 	};
+
 
 
 	const handleCreate = async () => {
@@ -145,7 +171,6 @@ function UserEventsPage() {
 
 			if (!res.ok) {
 				const errorData = await res.json();
-				console.error("Error response:", errorData);
 				throw new Error(errorData.error || errorData.message || `Failed to create event: ${res.status}`);
 			}
 
@@ -160,7 +185,6 @@ function UserEventsPage() {
 
 
 		} catch (err) {
-			setError(err.message || "Failed to create event");
 			notifications.show(
 				`Failed to create event. Reason: ${err.message}`,
 				{
@@ -243,6 +267,7 @@ function UserEventsPage() {
 								fullWidth
 								margin="dense"
 								label="Name"
+								value={formData.name}
 								name="name"
 								onChange={handleChange}
 							/>
@@ -251,6 +276,7 @@ function UserEventsPage() {
 								fullWidth
 								margin="dense"
 								label="Description"
+								value={formData.description}
 								name="description"
 								onChange={handleChange}
 							/>
@@ -259,6 +285,7 @@ function UserEventsPage() {
 								fullWidth
 								margin="dense"
 								label="Location"
+								value={formData.location}
 								name="location"
 								onChange={handleChange}
 							/>
@@ -284,7 +311,8 @@ function UserEventsPage() {
 							<TextField
 								fullWidth
 								margin="dense"
-								label="Capacity"
+								value={formData.capacity}
+								label="Capacity (leave it empty if unlimited capacity)"
 								name="capacity"
 								onChange={handleChange}
 							/>
@@ -292,6 +320,7 @@ function UserEventsPage() {
 							<TextField
 								fullWidth
 								margin="dense"
+								value={formData.points}
 								label="Points"
 								name="points"
 								onChange={handleChange}
