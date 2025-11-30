@@ -70,6 +70,7 @@ function UserEventsPage() {
 				}
 
 				const data = await res.json();
+				//data.result.startTime = dayjs(data.result.startTime).format('MMMM D, YYYY');
 				setEvents(data.results || []);
 			} catch (err) {
 				setError(err.message || "Failed to load events");
@@ -108,21 +109,38 @@ function UserEventsPage() {
 	let draftColumns = [
 		{ field: 'name', headerName: 'Name', flex: 2 },
 		{ field: 'location', headerName: 'Location', flex: 2 },
-		{ field: 'startTime', headerName: 'Start Time', flex: 2 },
-		{ field: 'endTime', headerName: 'End Time', flex: 2 },
-		{ field: 'capacity', headerName: 'Capacity', flex: 2 },
-		{ field: 'numGuests', headerName: '# of Guest', flex: 2 },
+		{
+			field: 'startTime', headerName: 'Start Time', flex: 2,
+			valueGetter: (value) => {
+				return value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : '';
+			},
+		},
+		{
+			field: 'endTime', headerName: 'End Time', flex: 2,
+			valueGetter: (value) => {
+				return value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : '';
+			},
+		},
+		{
+			field: 'capacity', headerName: 'Capacity', flex: 2,
+			valueGetter: (value) => {
+				return (value === null || value === "" || value === undefined) ? "Unlimited" : value;
+			}
+		}
 
 	];
 
 	let columns = (currentUser.role === "manager" || currentUser.role === "superuser")
-		? [...draftColumns, { field: 'published', headerName: 'Published', flex: 2 }]
-		: draftColumns;
+		? [...draftColumns, { field: 'pointsRemain', headerName: 'Points Remain', flex: 2 },
+		{ field: 'pointsAwarded', headerName: 'Points Awarded', flex: 2 },
+		{ field: 'published', headerName: 'Published', flex: 2 }]
+		: [...draftColumns, { field: 'numGuests', headerName: '# of Guest', flex: 2 }];
 
 
 	const handleRowClick = (row) => {
 		nav(`/events/${row.id}`);
 	};
+
 
 
 	const handleCreate = async () => {
@@ -243,6 +261,7 @@ function UserEventsPage() {
 								fullWidth
 								margin="dense"
 								label="Name"
+								value={formData.name}
 								name="name"
 								onChange={handleChange}
 							/>
@@ -251,6 +270,7 @@ function UserEventsPage() {
 								fullWidth
 								margin="dense"
 								label="Description"
+								value={formData.description}
 								name="description"
 								onChange={handleChange}
 							/>
@@ -259,6 +279,7 @@ function UserEventsPage() {
 								fullWidth
 								margin="dense"
 								label="Location"
+								value={formData.location}
 								name="location"
 								onChange={handleChange}
 							/>
@@ -284,7 +305,8 @@ function UserEventsPage() {
 							<TextField
 								fullWidth
 								margin="dense"
-								label="Capacity"
+								value={formData.capacity}
+								label="Capacity (leave it empty if unlimited capacity)"
 								name="capacity"
 								onChange={handleChange}
 							/>
@@ -292,6 +314,7 @@ function UserEventsPage() {
 							<TextField
 								fullWidth
 								margin="dense"
+								value={formData.points}
 								label="Points"
 								name="points"
 								onChange={handleChange}

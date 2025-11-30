@@ -163,12 +163,27 @@ function EventDetailPage() {
 		{ field: 'name', headerName: 'Name', flex: 2 },
 		{ field: 'description', headerName: 'Description', flex: 2 },
 		{ field: 'location', headerName: 'Location', flex: 2 },
-		{ field: 'startTime', headerName: 'Start Time', flex: 2 },
-		{ field: 'endTime', headerName: 'End Time', flex: 2 },
-		{ field: 'capacity', headerName: 'Capacity', flex: 2 },
+		{
+			field: 'startTime', headerName: 'Start Time', flex: 2,
+			valueGetter: (value) => {
+				return value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : '';
+			},
+		},
+		{
+			field: 'endTime', headerName: 'End Time', flex: 2,
+			valueGetter: (value) => {
+				return value ? dayjs(value).format('MM/DD/YYYY hh:mm A') : '';
+			},
+		},
+		{
+			field: 'capacity', headerName: 'Capacity', flex: 2,
+			valueGetter: (value) => {
+				return (value === null || value === "" || value === undefined) ? "Unlimited" : value;
+			}
+		},
 	];
 
-	let columns = (currentUser.role === "manager" || currentUser.role === "superuser")
+	let columns = (currentUser.role === "manager" || currentUser.role === "superuser" || isOrganizer)
 		? [...draftColumns, { field: 'pointsRemain', headerName: 'Points Remain', flex: 2 },
 		{ field: 'pointsAwarded', headerName: 'Points Awarded', flex: 2 },
 		{ field: 'published', headerName: 'Published', flex: 2 }]
@@ -314,7 +329,16 @@ function EventDetailPage() {
 	}
 
 	const handleOrganizerApply = async () => {
-		console.log(organizerFormData);
+		if (organizerFormData == {} || organizerFormData == "") {
+			notifications.show(
+				`All sections are blank.`,
+				{
+					severity: 'error',
+					autoHideDuration: 3000,
+				},
+			);
+			return;
+		}
 
 		try {
 			const res = await fetch(`${VITE_BACKEND_URL}/events/${eventId}/organizers`, {
@@ -433,7 +457,7 @@ function EventDetailPage() {
 		} catch (err) {
 			setError(err.message || "Failed to update event");
 			notifications.show(
-				`Failed to add guest. Reason: ${err.message}`,
+				`Operation failed. Reason: ${err.message}`,
 				{
 					severity: 'error',
 					autoHideDuration: 3000,
@@ -617,14 +641,14 @@ function EventDetailPage() {
 							/>
 						</LocalizationProvider>
 
-						<TextField fullWidth label="Capacity" name="capacity" onChange={handleChange} sx={{ mt: 2 }} />
+						<TextField fullWidth label="Capacity (Cannnot change to unlimited once you assign finite capacity)" name="capacity" onChange={handleChange} sx={{ mt: 2 }} />
 
 						{!isOrganizer && (<TextField fullWidth label="Points" name="points" onChange={handleChange} sx={{ mt: 2 }} />)}
 
 						{!isPublished && !isOrganizer && (
 							<FormControlLabel
 								control={<Checkbox name="published" onChange={handleChange} />}
-								label="Published"
+								label="Publish (Once you publish, you cannot unpublish later)"
 								sx={{ mt: 2 }}
 							/>
 						)}
@@ -700,11 +724,11 @@ function EventDetailPage() {
 						<Button onClick={
 							() => {
 								setOpenOrganizerDialog(false);
-								setOrganizerFormData({})
+								setOrganizerFormData({});
 							}
 						}>
 							Cancel</Button>
-						<Button variant="contained" onClick={() => { handleOrganizerApply(); setOpenOrganizerDialog(false); }}>
+						<Button variant="contained" onClick={() => { handleOrganizerApply(); setOpenOrganizerDialog(false); setOrganizerFormData({}) }}>
 							Add
 						</Button>
 					</DialogActions>
