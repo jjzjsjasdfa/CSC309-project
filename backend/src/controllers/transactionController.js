@@ -291,7 +291,8 @@ const transactionController = {
         return res.status(200).json({ id: transaction.id, utorid: transaction.utorid, type: transaction.type,
             spent: transaction.spent ?? undefined, amount: transaction.amount ?? transaction.earned ?? 0,
             promotionIds: transaction.promotions?.map(p => p.id) ?? [], suspicious: transaction.suspicious,
-            remark: transaction.remark ?? "", createdBy: transaction.createdBy, relatedId: transaction.relatedId
+            remark: transaction.remark ?? "", createdBy: transaction.createdBy, relatedId: transaction.relatedId, 
+            processedBy: transaction.processedBy
         });
     },
 
@@ -322,7 +323,7 @@ const transactionController = {
 
         return res.status(200).json({ id: updated.id, utorid: updated.utorid, type: updated.type, spent: updated.spent ?? undefined,
             amount: updated.amount ?? updated.earned ?? 0, promotionIds: updated.promotions?.map(p => p.id) ?? [],
-            suspicious: updated.suspicious, remark: updated.remark ?? "", createdBy: updated.createdBy
+            suspicious: updated.suspicious, remark: updated.remark ?? "", createdBy: updated.createdBy, processedBy: transaction.processedBy
         });
     }
 
